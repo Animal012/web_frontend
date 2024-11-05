@@ -50,7 +50,13 @@ const API = {
     async getShips(){
         const url = this.BASE_URL + "/ships/";
         return Ajax.get(url);
-    }
+    },
+
+    async getShipDetails(shipId: string) {
+        const url = this.BASE_URL + `/ships/${shipId}`;
+        return Ajax.get(url);
+    },
+    
 };
 
 export default API;

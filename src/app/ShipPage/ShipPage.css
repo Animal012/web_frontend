@@ -1,0 +1,34 @@
+.ship-page {
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+}
+
+.ship-details {
+    display: flex;
+    padding-top: 20px;
+}
+
+.ship-image-card {
+    margin-right: 50px;
+}
+
+.ship-image-card img {
+    max-width: 400px;
+    height: auto;
+    display: block;
+}
+
+.ship-info {
+    max-width: 400px;
+}
+
+.ship-info p {
+    font-size: 20px;
+    line-height: 1.5;
+    margin: 5px 0;
+}
+
+.ship-info strong {
+    font-weight: bold;
+}

@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "./ShipCard.css";
 
 interface Ship {
@@ -14,15 +15,24 @@ interface Ship {
 };
 
 const ShipCard: React.FC<{ ship: Ship }> = ({ ship }) => {
+    const navigate = useNavigate();
+
+    const handleTitleClick = () => {
+        navigate(`/ships/${ship.id}`);
+    };
+
     return (
         <div className="ship-card">
-            <img src={ship.photo} className="ship-image" />
-            <h2 className="ship-name">{ship.ship_name}</h2>
+            <img src={ship.photo} className="ship-image" alt={`${ship.ship_name}`} />
+            <h2 className="ship-name" onClick={handleTitleClick} style={{ cursor: "pointer" }}>
+                {ship.ship_name}
+            </h2>
             <p className="ship-details">Год постройки: {ship.year}</p>
             <p className="ship-details">Длина: {ship.length} м</p>
             <p className="ship-details">Водоизмещение: {ship.displacement} т</p>
             <p className="ship-details">Страна: {ship.country}</p>
         </div>
     );
-}
+};
+
 export default ShipCard;

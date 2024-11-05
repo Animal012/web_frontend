@@ -4,6 +4,6 @@
 }
 
 body {
-  background: url("/public/backgr.jpg");
+  background: url("/backgr.jpg");
   overflow-x: hidden;
 }
