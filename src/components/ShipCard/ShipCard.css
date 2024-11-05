@@ -1,0 +1,33 @@
+.ship-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-family: Arial, sans-serif;
+    background-color: #fdfdfd;
+    padding: 10px;
+}
+
+.ship-card img {
+    width: 100%;
+    height: 150px; /* Фиксированная высота для всех изображений */
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.ship-name {
+    font-weight: bold;
+    margin: 10px 0;
+    color: #333;
+}
+
+.ship-details {
+    font-size: 1em;
+    margin: 10px 0;
+    color: #555;
+}
