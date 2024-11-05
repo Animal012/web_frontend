@@ -1,3 +1,4 @@
+import { SHIPS_MOCK } from "../modules/mock";
 "use strict";
 
 interface Ship {
@@ -49,12 +50,35 @@ const API = {
 
     async getShips(){
         const url = this.BASE_URL + "/ships/";
-        return Ajax.get(url);
+        try {
+            const data = await Ajax.get(url);
+            return data;
+        } catch (error) {
+            console.error("Ошибка при загрузке данных с бэкенда:", error);
+            return SHIPS_MOCK;
+        }
+        //return Ajax.get(url);
     },
+
+    //async getShipDetails(shipId: string) {
+    //    const url = this.BASE_URL + `/ships/${shipId}`;
+    //    return Ajax.get(url);
+    //},
 
     async getShipDetails(shipId: string) {
         const url = this.BASE_URL + `/ships/${shipId}`;
-        return Ajax.get(url);
+        try {
+            const data = await Ajax.get(url);
+            return data;
+        } catch (error) {
+            console.error("Ошибка при загрузке данных о корабле:", error);
+            const mockShip = SHIPS_MOCK.find((s) => s.id === shipId);
+            if (mockShip) {
+                return mockShip; // Возвращаем мок-данные для конкретного корабля
+            } else {
+                throw new Error("Корабль не найден в мок-данных");
+            }
+        }
     },
     
 };

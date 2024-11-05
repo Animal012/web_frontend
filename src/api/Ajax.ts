@@ -33,6 +33,12 @@ class Ajax {
         url,
         body = {},
     }: RequestParams): Promise<any> {
+        const controller = new AbortController();
+        const timeout = 2000;
+        const timeoutId = setTimeout(() => {
+            controller.abort();
+        }, timeout);
+
         let request: Request;
         if (method === 'GET') {
             request = new Request(url, {
@@ -41,6 +47,7 @@ class Ajax {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
+                signal: controller.signal,
             });
         } else {
             request = new Request(url, {
@@ -50,9 +57,10 @@ class Ajax {
                 },
                 credentials: 'include',
                 body: JSON.stringify(body),
+                signal: controller.signal,
             });
         }
-
+        
         return await fetch(request);
     }
 }
