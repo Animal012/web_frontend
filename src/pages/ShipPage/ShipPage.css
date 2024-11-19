@@ -32,3 +32,37 @@
 .ship-info strong {
     font-weight: bold;
 }
+
+@media (max-width: 400px) {
+    .ship-page {
+        padding: 10px;
+    }
+
+    .ship-details {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .ship-image-card {
+        max-width: 80%;
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+
+    .ship-image-card img {
+        max-width: 100%;
+    }
+
+    .ship-info {
+        max-width: 80%;
+        padding: 10px;
+    }
+
+    .ship-info p {
+        font-size: 16px;
+    }
+
+    .ship-info strong {
+        font-size: 18px;
+    }
+}

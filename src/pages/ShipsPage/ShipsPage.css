@@ -63,11 +63,22 @@
 }
 
 .ship-card-container {
-    width: 66.67%; /* 2/3 экрана */
+    width: 66.67%;
 }
 
 .ship-card-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 30px 20px; /* 30px - горизонтальный отступ, 20px - вертикальный */
+    gap: 30px 20px;
+}
+
+@media (max-width: 400px) {
+    .ship-card-container {
+        width: 66.7%;
+    }
+
+    .ship-card-grid {
+        grid-template-columns: 1fr;
+        gap: 20px 10px;
+    }
 }
