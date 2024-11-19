@@ -20,21 +20,13 @@ class Ajax {
         });
     }
 
-    static post({ url, body }: PostParams): Promise<any> {
-        return this.#makeRequest({ method: 'POST', url, body });
-    }
-
-    static delete({ url, body }: PostParams): Promise<any> {
-        return this.#makeRequest({ method: 'DELETE', url, body });
-    }
-
     static async #makeRequest({
         method,
         url,
         body = {},
     }: RequestParams): Promise<any> {
         const controller = new AbortController();
-        const timeout = 2000;
+        const timeout = 1000;
         const timeoutId = setTimeout(() => {
             controller.abort();
         }, timeout);

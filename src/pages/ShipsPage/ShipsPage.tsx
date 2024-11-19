@@ -4,7 +4,7 @@ import ShipCard from "../../components/ShipCard/ShipCard";
 import { BreadCrumbs } from "../../components/BreadCrumbs/BreadCrumbs";
 import { ROUTE_LABELS } from "../../Route";
 import { SHIPS_MOCK } from "../../modules/mock";
-import "./MainPage.css";
+import "./ShipsPage.css";
 
 interface Ship {
     id: string;

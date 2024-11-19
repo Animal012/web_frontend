@@ -8,7 +8,7 @@ export const SHIPS_MOCK = [
         "displacement": 7950,
         "crew": 667,
         "country": "Япония",
-        "photo": "http://127.0.0.1:9000/navy-sea/1.jpg"
+        "photo": "../public/default.jpg"
     },
     {
         "id": "2",
@@ -19,7 +19,7 @@ export const SHIPS_MOCK = [
         "displacement": 8300,
         "crew": 456,
         "country": "Япония",
-        "photo": "http://127.0.0.1:9000/navy-sea/2.jpg"
+        "photo": "../public/default.jpg"
     },
     {
         "id": "3",
@@ -30,7 +30,7 @@ export const SHIPS_MOCK = [
         "displacement": 10000,
         "crew": 542,
         "country": "США",
-        "photo": "http://127.0.0.1:9000/navy-sea/3.jpg"
+        "photo": "../public/default.jpg"
     },
     {
         "id": "4",
@@ -41,6 +41,6 @@ export const SHIPS_MOCK = [
         "displacement": 1838,
         "crew": 701,
         "country": "США",
-        "photo": "http://127.0.0.1:9000/navy-sea/4.jpg"
+        "photo": "../public/default.jpg"
     }
 ]
