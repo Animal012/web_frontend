@@ -36,9 +36,6 @@ const router = createBrowserRouter(
       ),
     },
   ],
-  {
-    basename: '/Navy_sea',
-  }
 );
 
 createRoot(document.getElementById('root')!).render(

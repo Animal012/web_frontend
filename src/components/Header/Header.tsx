@@ -6,7 +6,7 @@ const Header: FC = () => {
     return(
         <nav className="header">
             <Link to="/">
-                <img src="/Navy_sea/icon.svg"/>
+                <img src="/icon.svg"/>
             </Link>
         </nav>
     )
