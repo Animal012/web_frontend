@@ -71,10 +71,10 @@ const MainPage: FC = () => {
                     onChange={(e) => dispatch(setSearchQuery(e.target.value))}
                 />
                 <button type="button" className="search-button" onClick={handleSearch}>
-                    <img src="/search.svg" alt="Поиск" className="search-icon" />
+                    <img src="/Navy_sea/search.svg" alt="Поиск" className="search-icon" />
                 </button>
                 <a href="#">
-                    <img src="/plus.svg" alt="Корзина" className="bucket-icon" />
+                    <img src="/Navy_sea/plus.svg" alt="Корзина" className="bucket-icon" />
                     <span className="bucket-count">{shipsInBucket}</span>
                 </a>
             </div>

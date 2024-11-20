@@ -12,6 +12,6 @@ export default defineConfig({
               }
             }
    },
-  //base: "/Navy_sea",
+  base: "/Navy_sea",
   plugins: [react()],
 })
