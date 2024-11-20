@@ -27,7 +27,7 @@ const ShipPage = () => {
     useEffect(() => {
         const getShipDetails = async () => {
             if (!shipId) return;
-
+    
             try {
                 const response = await API.getShipDetails(shipId);
                 const data = await response.json();
@@ -45,17 +45,21 @@ const ShipPage = () => {
                 setLoading(false);
             }
         };
-
+    
         getShipDetails();
     }, [shipId]);
-
+    
     if (loading) {
         return <div>Загрузка...</div>;
     }
-
+    
+    if (error) {
+        return <div>{error}</div>;
+    }
+    
     if (!ship) {
         return <div>Корабль не найден.</div>;
-    }
+    }    
 
     return (
         <div>

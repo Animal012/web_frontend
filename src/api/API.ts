@@ -1,29 +1,6 @@
 import { SHIPS_MOCK } from "../modules/mock";
 "use strict";
 
-interface Ship {
-    id: string;
-    ship_name: string;
-    description: string;
-    year: number;
-    displacement: number;
-    length: number;
-    crew: number;
-    country: string;
-    photo: string;
-};
-
-interface RegisterParams {
-    username: string;
-    password: string;
-}
-
-interface LoginParams {
-    username: string;
-    password: string;
-}
-
-
 import Ajax from "./Ajax.ts";
 
 const API = {

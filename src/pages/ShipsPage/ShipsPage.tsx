@@ -16,6 +16,18 @@ import { ROUTE_LABELS } from "../../Route";
 import { SHIPS_MOCK } from "../../modules/mock";
 import "./ShipsPage.css";
 
+interface Ship {
+    id: string;
+    ship_name: string;
+    description: string;
+    year: number;
+    displacement: number;
+    length: number;
+    crew: number;
+    country: string;
+    photo: string;
+};
+
 const MainPage: FC = () => {
     const dispatch = useDispatch();
     const ships = useSelector(selectShips);
@@ -71,7 +83,7 @@ const MainPage: FC = () => {
                     <div>К сожалению, ничего не найдено :(</div>
                 ) : (
                     <div className="ship-card-grid">
-                        {ships.map((ship) => (
+                        {ships.map((ship: Ship) => (
                             <ShipCard key={ship.id} ship={ship} />
                         ))}
                     </div>
