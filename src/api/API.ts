@@ -27,7 +27,7 @@ interface LoginParams {
 import Ajax from "./Ajax.ts";
 
 const API = {
-    BASE_URL: `http://10.211.55.5:3000/api`,
+    BASE_URL: `http://192.168.13.113:3000/api`,
 
     // async login({ username, password }: LoginParams) {
     //     const url = this.BASE_URL + "/login/";
