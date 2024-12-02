@@ -1,14 +1,6 @@
-import { FC, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-    setShips,
-    setSearchQuery,
-    selectShips,
-    selectSearchQuery,
-    selectShipsInBucket,
-    setShipsInBucket,
-    setDraftId,
-} from "../../slices/shipsSlice";
+import { FC, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { setShipName, useTitle } from "../../slices/shipsSlice"; // Используем только существующие экшены и селекторы
 import API from "../../api/API";
 import ShipCard from "../../components/ShipCard/ShipCard";
 import { BreadCrumbs } from "../../components/BreadCrumbs/BreadCrumbs";
@@ -30,22 +22,18 @@ interface Ship {
 
 const MainPage: FC = () => {
     const dispatch = useDispatch();
-    const ships = useSelector(selectShips);
-    const searchQuery = useSelector(selectSearchQuery);
-    const shipsInBucket = useSelector(selectShipsInBucket);
+    const shipName = useTitle(); // Получаем строку поиска из Redux
+    const [ships, setShips] = useState<Ship[]>([]); // Локальное состояние для списка кораблей
+    const [searchQuery, setSearchQuery] = useState(shipName || ""); // Инициализируем строку поиска значением из Redux
 
     const getShips = async () => {
         try {
             const response = await API.getShips();
             const data = await response.json();
-            dispatch(setShips(data.ships));
-            dispatch(setDraftId(data.draft_fight_id));
-            dispatch(setShipsInBucket(data.count));
+            setShips(data.ships); // Устанавливаем корабли в локальное состояние
         } catch (error) {
             console.error("Ошибка при загрузке данных с бэкенда:", error);
-            dispatch(setShips(SHIPS_MOCK));
-            dispatch(setDraftId(null));
-            dispatch(setShipsInBucket(0));
+            setShips(SHIPS_MOCK); // Если ошибка, используем мок-данные
         }
     };
 
@@ -53,9 +41,23 @@ const MainPage: FC = () => {
         getShips();
     }, []);
 
-    const handleSearch = () => {
-        dispatch(setSearchQuery(searchQuery));
+    // Фильтруем корабли по строке поиска
+    const filteredShips = ships.filter((ship) =>
+        ship.ship_name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value); // Обновляем локальное состояние строки поиска
     };
+
+    const handleShipNameChange = () => {
+        dispatch(setShipName(searchQuery)); // Обновляем строку поиска в Redux
+    };
+
+    useEffect(() => {
+        // Если строка поиска изменяется, обновляем Redux
+        dispatch(setShipName(searchQuery));
+    }, [searchQuery, dispatch]);
 
     return (
         <div className="main-page">
@@ -67,23 +69,19 @@ const MainPage: FC = () => {
                     type="text"
                     className="search-input"
                     placeholder="Введите название"
-                    value={searchQuery}
-                    onChange={(e) => dispatch(setSearchQuery(e.target.value))}
+                    value={searchQuery} // Значение из локального состояния
+                    onChange={handleSearchChange} // Обновляем локальное состояние
                 />
-                <button type="button" className="search-button" onClick={handleSearch}>
+                <button type="button" className="search-button" onClick={handleShipNameChange}>
                     <img src="/search.svg" alt="Поиск" className="search-icon" />
                 </button>
-                <a href="#">
-                    <img src="/plus.svg" alt="Корзина" className="bucket-icon" />
-                    <span className="bucket-count">{shipsInBucket}</span>
-                </a>
             </div>
             <div className="ship-card-container">
-                {ships.length === 0 ? (
+                {filteredShips.length === 0 ? (
                     <div>К сожалению, ничего не найдено :(</div>
                 ) : (
                     <div className="ship-card-grid">
-                        {ships.map((ship: Ship) => (
+                        {filteredShips.map((ship: Ship) => (
                             <ShipCard key={ship.id} ship={ship} />
                         ))}
                     </div>
