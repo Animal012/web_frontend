@@ -1,7 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setShipName, useTitle } from "../../slices/shipsSlice"; // Используем только существующие экшены и селекторы
 import API from "../../api/API";
 import ShipCard from "../../components/ShipCard/ShipCard";
 import { BreadCrumbs } from "../../components/BreadCrumbs/BreadCrumbs";
@@ -21,28 +20,28 @@ interface Ship {
     crew: number;
     country: string;
     photo: string;
-};
+}
 
-const MainPage: FC = () => {
+const ShipsPage: FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { count, draftFightId } = useSelector((state: RootState) => state.fight);
-    const shipName = useTitle(); // Получаем строку поиска из Redux
-    const [ships, setShips] = useState<Ship[]>([]); // Локальное состояние для списка кораблей
-    const [searchQuery, setSearchQuery] = useState(shipName || ""); // Инициализируем строку поиска значением из Redux
+
+    const [ships, setShips] = useState<Ship[]>([]);
+    const [searchQuery, setSearchQuery] = useState("");
 
     const getShips = async () => {
         try {
             const response = await API.getShips();
             const data = await response.json();
-            setShips(data.ships); // Устанавливаем корабли в локальное состояние
+            setShips(data.ships);
             dispatch(setDraftFight({
                 draftFightId: data.draft_fight_id,
-                count: data.count
+                count: data.count,
             }));
         } catch (error) {
             console.error("Ошибка при загрузке данных с бэкенда:", error);
-            setShips(SHIPS_MOCK); // Если ошибка, используем мок-данные
+            setShips(SHIPS_MOCK);
         }
     };
 
@@ -50,17 +49,12 @@ const MainPage: FC = () => {
         getShips();
     }, []);
 
-    // Фильтруем корабли по строке поиска
     const filteredShips = ships.filter((ship) =>
         ship.ship_name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchQuery(e.target.value); // Обновляем локальное состояние строки поиска
-    };
-
-    const handleShipNameChange = () => {
-        dispatch(setShipName(searchQuery)); // Обновляем строку поиска в Redux
+        setSearchQuery(e.target.value);
     };
 
     const handleGoToFight = () => {
@@ -68,16 +62,6 @@ const MainPage: FC = () => {
             navigate(`/fights/${draftFightId}`);
         }
     };
-
-    useEffect(() => {
-        // Если строка поиска изменяется, обновляем Redux
-        dispatch(setShipName(searchQuery));
-    }, [searchQuery, dispatch]);
-
-    useEffect(() => {
-        // Отслеживаем изменения count в Redux, чтобы обновить корзину
-        console.log("count updated:", count); // Это можно удалить в продакшн
-    }, [count]);
 
     return (
         <div className="main-page">
@@ -89,19 +73,15 @@ const MainPage: FC = () => {
                     type="text"
                     className="search-input"
                     placeholder="Введите название"
-                    value={searchQuery} // Значение из локального состояния
-                    onChange={handleSearchChange} // Обновляем локальное состояние
+                    value={searchQuery}
+                    onChange={handleSearchChange}
                 />
-                <button type="button" className="search-button" onClick={handleShipNameChange}>
-                    <img src="/search.svg" alt="Поиск" className="search-icon" />
-                </button>
                 <div
                     onClick={count > 0 ? handleGoToFight : undefined}
-                    style={{ cursor: count > 0 ? 'pointer' : 'not-allowed' }}>
-                    <img src="/plus.svg" className="bucket-icon"/>
-                    <span className="bucket-count">
-                        {count}
-                    </span>
+                    style={{ cursor: count > 0 ? 'pointer' : 'not-allowed' }}
+                >
+                    <img src="/plus.svg" className="bucket-icon" />
+                    <span className="bucket-count">{count}</span>
                 </div>
             </div>
             <div className="ship-card-container">
@@ -119,4 +99,4 @@ const MainPage: FC = () => {
     );
 };
 
-export default MainPage;
+export default ShipsPage;

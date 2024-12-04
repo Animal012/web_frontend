@@ -50,13 +50,13 @@
     margin-bottom: 10px;
 }
 
-.ship-info h4 {
+.ship-info-fight h4 {
     font-size: 18px;
     margin: 10px 0 10px;
     text-align: center;
 }
 
-.ship-info p {
+.ship-info-fight p {
     margin: 5px 0;
     font-size: 14px;
     text-align: center;
@@ -173,4 +173,16 @@
     padding-bottom: 10px;
     padding-top: 10px;
     font-size: 22px;
+}
+
+.loading-gif {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
 }

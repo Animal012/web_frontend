@@ -51,7 +51,7 @@ const FightPage = () => {
         getFightDetails();
     }, [fightId]);
 
-    if (loading) return <div>Загрузка...</div>;
+    if (loading) return <div className="loading-gif"><img src="/loading.webp"></img></div>;
     if (error) return <div>{error}</div>;
     if (!fight) return <div>Сражение не найдено.</div>;
 
@@ -144,7 +144,7 @@ const FightPage = () => {
                         {/* Карточка корабля */}
                         <div className="ship-card">
                             <img src={ship.photo} alt={ship.ship_name} className="ship-photo" />
-                            <div className="ship-info">
+                            <div className="ship-info-fight">
                                 <h1>{ship.ship_name}</h1>
                                 <h4><strong>Экипаж:</strong> {ship.crew}</h4>
                                 {isEditable && (

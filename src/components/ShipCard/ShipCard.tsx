@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import "./ShipCard.css";
 import API from "../../api/API";
-import { setDraftFight, setTotalShipCount } from "../../slices/fightSlice"; 
+import { setDraftFight } from "../../slices/fightSlice"; 
 
 interface Ship {
     id: string;
@@ -15,7 +15,7 @@ interface Ship {
     crew: number;
     country: string;
     photo: string;
-};
+}
 
 const ShipCard: React.FC<{ ship: Ship }> = ({ ship }) => {
     const navigate = useNavigate();
@@ -32,13 +32,12 @@ const ShipCard: React.FC<{ ship: Ship }> = ({ ship }) => {
             const data = await response.json();
 
             if (data.draft_fight_id) {
-                // Обновляем состояние сражения в Redux
                 dispatch(setDraftFight({
                     draftFightId: data.draft_fight_id,
-                    count: data.count
+                    count: data.count,
                 }));
-                // Обновляем общий счетчик кораблей в сражении
-                dispatch(setTotalShipCount(data.count));
+            } else {
+                console.error("Ошибка: неверный ответ от API");
             }
         } catch (error) {
             console.error("Ошибка при добавлении корабля в сражение:", error);

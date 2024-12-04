@@ -49,9 +49,10 @@ const ShipPage = () => {
         getShipDetails();
     }, [shipId]);
     
-    if (loading) {
-        return <div>Загрузка...</div>;
-    }
+    if (loading) 
+        return <div className="loading-gif">
+                    <img src="/loading.webp"></img>
+                </div>;
     
     if (error) {
         return <div>{error}</div>;
