@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import API from "../../api/API";
+import { api } from "../../api/index"
 import { BreadCrumbs } from "../../components/BreadCrumbs/BreadCrumbs";
 import { ROUTE_LABELS } from "../../Route";
 import { SHIPS_MOCK } from "../../modules/mock";
@@ -29,9 +29,10 @@ const ShipPage = () => {
             if (!shipId) return;
     
             try {
-                const response = await API.getShipDetails(shipId);
-                const data = await response.json();
-                setShip(data);
+                const response = await Promise.race([
+                    api.ships.shipsRead(shipId as string)
+                ]) as any;
+                setShip(response.data);
             } catch (error) {
                 console.error("Ошибка при загрузке данных о корабле:", error);
                 const mockShip = SHIPS_MOCK.find((s) => String(s.id) === shipId);
