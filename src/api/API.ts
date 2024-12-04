@@ -1,150 +1,156 @@
-import { SHIPS_MOCK } from "../modules/mock";
 "use strict";
 
-import Ajax from "./Ajax.ts";
-//import { getCookie } from "./Utils";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
+import { getCookie } from "./Utils";
 
 interface LoginParams {
     email: string;
     password: string;
 }
 
-const API = {
-    BASE_URL: `http://${window.location.hostname}:3000/api`,
+interface APIResponse<T = any> {
+    json: () => Promise<T>;
+    ok: boolean;
+    status: number;
+    statusText: string;
+}
 
-    async getCsrfToken() {
+class API {
+    private static instance: AxiosInstance;
+
+    private static getInstance(): AxiosInstance {
+        if (!this.instance) {
+            this.instance = axios.create({
+                baseURL: "http://localhost:3000/api/",
+                withCredentials: true,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            this.instance.interceptors.request.use(
+                (config) => {
+                    if (["post", "put", "delete"].includes(config.method || "")) {
+                        const csrfToken = getCookie("csrftoken");
+                        if (!csrfToken) {
+                            throw new Error("CSRF token is missing");
+                        }
+                        config.headers["X-CSRFToken"] = csrfToken;
+                    }
+                    return config;
+                },
+                (error) => Promise.reject(error)
+            );
+
+            this.instance.interceptors.response.use(
+                (response) => response,
+                (error) => {
+                    console.error("[API Error]:", error.response?.data || error.message);
+                    return Promise.reject(error);
+                }
+            );
+        }
+        return this.instance;
+    }
+
+    private static handleResponse<T>(response: AxiosResponse<T>): APIResponse<T> {
+        return {
+            json: async () => response.data,
+            ok: response.status >= 200 && response.status < 300,
+            status: response.status,
+            statusText: response.statusText,
+        };
+    }
+
+    private static async safeRequest<T>(promise: Promise<AxiosResponse<T>>): Promise<APIResponse<T>> {
         try {
-            const url = this.BASE_URL + 'csrf/';
-            const response = await Ajax.get(url);
-            const data = await response.json()
-            return data.csrfToken
+            const response = await promise;
+            return this.handleResponse(response);
+        } catch (error: any) {
+            if (error.response) {
+                return this.handleResponse(error.response);
+            }
+            throw error; // Network or unexpected error
+        }
+    }
+
+    static async getCsrfToken(): Promise<string | null> {
+        try {
+            const response = await this.getInstance().get("csrf/");
+            return response.data.csrfToken;
         } catch (error) {
-            console.error('Failed to fetch CSRF token:', error);
+            console.error("Failed to fetch CSRF token:", error);
             return null;
         }
-    },
+    }
 
-    async getSession() {
-        const url = this.BASE_URL + 'users/check/'
-        return Ajax.get(url)
-    },
+    static async getSession() {
+        return this.safeRequest(this.getInstance().get("users/check/"));
+    }
 
-    async getShips(){
-        const url = this.BASE_URL + "/ships/";
-        try {
-            const data = await Ajax.get(url);
-            return data;
-        } catch (error) {
-            console.error("Ошибка при загрузке данных с бэкенда:", error);
-            return SHIPS_MOCK;
-        }
-        //return Ajax.get(url);
-    },
+    static async getShips(postfix?: string) {
+        const url = postfix ? `ships/${postfix}` : "ships/";
+        return this.safeRequest(this.getInstance().get(url));
+    }
 
-    async getShipDetails(shipId: string) {
-        const url = this.BASE_URL + `/ships/${shipId}/`;
-        try {
-            const data = await Ajax.get(url);
-            return data;
-        } catch (error) {
-            console.error("Ошибка при загрузке данных о корабле:", error);
-            const mockShip = SHIPS_MOCK.find((s) => s.id === shipId);
-            if (mockShip) {
-                return mockShip;
-            } else {
-                throw new Error("Корабль не найден в мок-данных");
-            }
-        }
-    },
+    static async getShipDetails(id: string) {
+        return this.safeRequest(this.getInstance().get(`ships/${id}/`));
+    }
 
-    async login({email, password}:LoginParams) {
-        const url = this.BASE_URL + '/login/'
-        const body = {
-            email: email,
-            password: password
-        }
-        return Ajax.post({url, body})
-    },
+    static async login({ email, password }: LoginParams) {
+        return this.safeRequest(this.getInstance().post("login/", { email, password }));
+    }
 
-    async auth({email, password}:LoginParams) {
-        const url = this.BASE_URL + '/users/auth/'
-        const body = {
-            email: email,
-            password: password
-        }
-        return Ajax.post({url, body})
-    },
-    
-    async logout() {
-        const url = this.BASE_URL + 'logout/';
-        const body = {};
-        return Ajax.post({url, body})
-    },
+    static async logout() {
+        return this.safeRequest(this.getInstance().post("logout/", {}));
+    }
 
-    async updateProfile(email?: string, password?: string) {
-        const url = this.BASE_URL + 'users/profile/';
-        const body: any = {};
-        if (email) body.email = email;
-        if (password) body.password = password;
+    static async auth({ email, password }: LoginParams) {
+        return this.safeRequest(this.getInstance().post("users/auth/", { email, password }));
+    }
 
-        return Ajax.put({url, body})
-    }, 
-
-    async getFights(filters?: { date_from?: string; date_to?: string; status?: string }) {
+    static async getFights(filters?: { date_from?: string; date_to?: string; status?: string }) {
         const query = new URLSearchParams(filters).toString();
-        const url = `${this.BASE_URL}fights/?${query}`;
-        return Ajax.get(url);
-    },         
+        return this.safeRequest(this.getInstance().get(`fights/?${query}`));
+    }
 
-    async getFightById(id: number){
-        const url = this.BASE_URL + `/fights/${id}/`;
-        return Ajax.get(url)
-    },
-    
-    async addShipToDraft(id: number){
-        const url = this.BASE_URL + `/ships/${id}/draft/`;
-        const body = {}
-        return Ajax.post({url, body});
-    },
+    static async getFightById(id: number) {
+        return this.safeRequest(this.getInstance().get(`fights/${id}/`));
+    }
 
-    async changeAddFields(id:number, fight_name?: string, result?: string) {
-        console.log(id);
-        console.log(fight_name);
-        const url = this.BASE_URL + `/fights/${id}/edit/`;
-        const body: any = {};
+    static async addShipToDraft(id: number) {
+        return this.safeRequest(this.getInstance().post(`ships/${id}/draft/`, {}));
+    }
+
+    static async changeShipFields(shipId: number, fightId: number, admiral?: string,) {
+        return this.safeRequest(this.getInstance().put(`fights/${fightId}/ships/${shipId}/`, { admiral: admiral }));
+    }
+
+    static async changeAddFields(id: number, fight_name?: string, result?: string) {
+        const body: Record<string, any> = {};
         if (fight_name) body.fight_name = fight_name;
         if (result) body.result = result;
-
-        return Ajax.put({url, body})
-    },
-
-    async changeShipFields(shipId: number, fightId: number, admiral?: string){
-        const url = this.BASE_URL + `fights/${fightId}/ships/${shipId}/`;
-        const body: any = {};
-        if (admiral) body.admiral = admiral;
-
-        return Ajax.put({url, body})
-    },
-
-    async deleteShipFromDraft(fightId: number, shipId: number) {
-        const url = this.BASE_URL + `fights/${fightId}/ships/${shipId}/`;
-        const body = {}
-        return Ajax.delete({url, body})
-    },
-
-    async formFight(fightId: number) {
-        const url = this.BASE_URL + `fights/${fightId}/form/`;
-        const body = {
-            status: 'f'
-        }
-        return Ajax.put({url, body});
-    },
-
-    async deleteFight(fightId: number) {
-        const url = this.BASE_URL + `/fights/${fightId}/`;
-        const body = {}
-        return Ajax.delete({url, body});
+        return this.safeRequest(this.getInstance().put(`fights/${id}/edit/`, body));
     }
-};
+
+    static async deleteShipFromDraft(fightId: number, shipId: number) {
+        return this.safeRequest(this.getInstance().delete(`fights/${fightId}/ships/${shipId}/`));
+    }
+
+    static async formFight(fightId: number) {
+        return this.safeRequest(this.getInstance().put(`fights/${fightId}/form/`, { status: "f" }));
+    }
+
+    static async deleteFight(fightId: number) {
+        return this.safeRequest(this.getInstance().delete(`fights/${fightId}/`));
+    }
+
+    static async updateProfile(email?: string, password?: string) {
+        const body: Record<string, any> = {};
+        if (email) body.email = email;
+        if (password) body.password = password;
+        return this.safeRequest(this.getInstance().put("users/profile/", body));
+    }
+}
 
 export default API;
