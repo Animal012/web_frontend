@@ -167,3 +167,10 @@
 .fight-delete:hover {
     background-color: #a71d2a; /* Более темный красный при наведении */
 }
+
+.total-sailors {
+    text-align: center;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    font-size: 22px;
+}

@@ -42,7 +42,7 @@ const Header: FC = () => {
       </Link>
       <div className="header-links">
         <Link to="/ships">Корабли</Link>
-        <Link to="/battles">Сражения</Link>
+        <Link to="/fights">Сражения</Link>
         {isLoggedIn ? (
           <>
             <Link to="/profile"><span>{userName}</span></Link>

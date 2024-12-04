@@ -141,7 +141,7 @@ const API = {
     },
 
     async deleteFight(fightId: number) {
-        const url = this.BASE_URL + `fights/${fightId}/`;
+        const url = this.BASE_URL + `/fights/${fightId}/`;
         const body = {}
         return Ajax.delete({url, body});
     }

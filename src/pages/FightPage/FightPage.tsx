@@ -195,7 +195,7 @@ const FightPage = () => {
                 )}
             </div>
             {!isEditable && fight.sailors != null && (
-                <div className="total-cost">
+                <div className="total-sailors">
                     Общее количество участников сражения: {fight.sailors}
                 </div>
             )}
