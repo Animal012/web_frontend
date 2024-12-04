@@ -1,6 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import "./ShipCard.css";
+import API from "../../api/API";
+import { setDraftFight, setTotalShipCount } from "../../slices/fightSlice"; 
 
 interface Ship {
     id: string;
@@ -16,9 +19,30 @@ interface Ship {
 
 const ShipCard: React.FC<{ ship: Ship }> = ({ ship }) => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handleTitleClick = () => {
         navigate(`/ships/${ship.id}`);
+    };
+
+    const handleAddToFight = async (event: React.MouseEvent) => {
+        event.stopPropagation();
+        try {
+            const response = await API.addShipToDraft(Number(ship.id));
+            const data = await response.json();
+
+            if (data.draft_fight_id) {
+                // Обновляем состояние сражения в Redux
+                dispatch(setDraftFight({
+                    draftFightId: data.draft_fight_id,
+                    count: data.count
+                }));
+                // Обновляем общий счетчик кораблей в сражении
+                dispatch(setTotalShipCount(data.count));
+            }
+        } catch (error) {
+            console.error("Ошибка при добавлении корабля в сражение:", error);
+        }
     };
 
     return (
@@ -31,6 +55,11 @@ const ShipCard: React.FC<{ ship: Ship }> = ({ ship }) => {
             <p className="ship-details">Длина: {ship.length} м</p>
             <p className="ship-details">Водоизмещение: {ship.displacement} т</p>
             <p className="ship-details">Страна: {ship.country}</p>
+            <div className="ship-add-button">
+                <button onClick={handleAddToFight}>
+                    Добавить в сражение
+                </button>
+            </div>
         </div>
     );
 };

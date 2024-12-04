@@ -2,7 +2,7 @@ import { SHIPS_MOCK } from "../modules/mock";
 "use strict";
 
 import Ajax from "./Ajax.ts";
-import { getCookie } from "./Utils";
+//import { getCookie } from "./Utils";
 
 interface LoginParams {
     email: string;
@@ -88,6 +88,61 @@ const API = {
         if (password) body.password = password;
 
         return Ajax.put({url, body})
+    }, 
+
+    async getFights(filters?: { date_from?: string; date_to?: string; status?: string }) {
+        const query = new URLSearchParams(filters).toString();
+        const url = `${this.BASE_URL}fights/?${query}`;
+        return Ajax.get(url);
+    },         
+
+    async getFightById(id: number){
+        const url = this.BASE_URL + `/fights/${id}/`;
+        return Ajax.get(url)
+    },
+    
+    async addShipToDraft(id: number){
+        const url = this.BASE_URL + `/ships/${id}/draft/`;
+        const body = {}
+        return Ajax.post({url, body});
+    },
+
+    async changeAddFields(id:number, fight_name?: string, result?: string) {
+        const url = this.BASE_URL + `/fights/${id}/edit/`;
+        const body = {
+            figth_name: fight_name,
+            result: result
+        }
+
+        return Ajax.put({url, body})
+    },
+
+    async changeShipFields(shipId: number, fightId: number, admiral?: string){
+        const url = this.BASE_URL + `fights/${fightId}/ships/${shipId}/`;
+        const body: any = {};
+        if (admiral) body.guest = admiral;
+
+        return Ajax.put({url, body})
+    },
+
+    async deleteShipFromDraft(fightId: number, shipId: number) {
+        const url = this.BASE_URL + `fights/${fightId}/ships/${shipId}/`;
+        const body = {}
+        return Ajax.delete({url, body})
+    },
+
+    async formFight(fightId: number) {
+        const url = this.BASE_URL + `fights/${fightId}/form/`;
+        const body = {
+            status: 'f'
+        }
+        return Ajax.put({url, body});
+    },
+
+    async deleteFight(fightId: number) {
+        const url = this.BASE_URL + `fights/${fightId}/`;
+        const body = {}
+        return Ajax.delete({url, body});
     }
 };
 

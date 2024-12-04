@@ -1,10 +1,12 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import shipsReducer from "./slices/shipsSlice";
 import userReducer from "./slices/userSlice";
+import fightReducer from "./slices/fightSlice";
 
 const rootReducer = combineReducers({
     ships: shipsReducer,
     user: userReducer,
+    fight: fightReducer,
 });
 
 const store = configureStore({

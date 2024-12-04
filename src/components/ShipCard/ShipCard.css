@@ -24,3 +24,30 @@
     font-weight: bold;
     margin: 10px 0;
 }
+
+.ship-add-button button {
+    margin-top: 10px !important;
+    background-color: #b0b0b0;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.ship-add-button button:hover {
+    background-color: #999999;
+    transform: scale(1.05);
+}
+
+.ship-add-button button:focus {
+    outline: none;
+}
+
+.ship-add-button button:active {
+    background-color: #7f7f7f;
+    transform: scale(0.98);
+}
+
