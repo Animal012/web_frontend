@@ -90,9 +90,12 @@ const FightPage = () => {
     // Обработчик для потери фокуса в поле Названия сражения
     const handleFightNameBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
         const newFightName = e.target.value;
-        if (newFightName !== fight?.fight_name) {
+        try {
             // Вызов существующего метода changeAddFields из API
             await API.changeAddFields(Number(fightId), newFightName); // Отправка PUT запроса
+            console.log('Название сражения обновлено');
+        } catch (error) {
+            console.error('Ошибка при обновлении названия сражения:', error);
         }
     };
 
@@ -100,8 +103,28 @@ const FightPage = () => {
     const handleResultBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
         const newResult = e.target.value;
         if (newResult !== fight?.result) {
-            // Вызов существующего метода changeAddFields из API
-            await API.changeAddFields(Number(fightId), undefined, newResult); // Отправка PUT запроса
+            try {
+                // Вызов существующего метода changeAddFields из API
+                await API.changeAddFields(Number(fightId), undefined, newResult); // Отправка PUT запроса
+                console.log('Результат сражения обновлен');
+            } catch (error) {
+                console.error('Ошибка при обновлении результата сражения:', error);
+            }
+        }
+    };
+
+    // Обработчик для потери фокуса в поле Адмирала
+    const handleAdmiralBlur = async (e: React.FocusEvent<HTMLInputElement>, shipId: string, index: number) => {
+        const newAdmiral = e.target.value;
+        const updatedShips = [...fight.ships];
+        updatedShips[index].admiral = newAdmiral;
+        setFight({ ...fight, ships: updatedShips });
+
+        try {
+            await API.changeShipFields(Number(shipId), Number(fightId), newAdmiral); // Отправка PUT запроса для обновления адмирала
+            console.log('Имя адмирала обновлено');
+        } catch (error) {
+            console.error('Ошибка при обновлении имени адмирала:', error);
         }
     };
 
@@ -109,8 +132,8 @@ const FightPage = () => {
         <div className="fight-page">
             <h1 className="fight-name-fix">Название сражения</h1>
             <input
+                defaultValue={fight.fight_name}  // Используйте правильное значение
                 type="text"
-                value={"fight.fight_name"}
                 className="fight-name-input"
                 onBlur={handleFightNameBlur}  // Добавляем обработчик потери фокуса
                 disabled={!isEditable}  // Сделать поле недоступным, если не редактируемое
@@ -137,14 +160,10 @@ const FightPage = () => {
                             <h2>Адмирал</h2>
                             <input
                                 type="text"
-                                value={admiral}
+                                defaultValue={admiral}
                                 className="admiral-input"
-                                onChange={(e) => {
-                                    const updatedShips = [...fight.ships];
-                                    updatedShips[index].admiral = e.target.value;
-                                    setFight({ ...fight, ships: updatedShips });
-                                }}
-                                disabled={!isEditable}  // Сделать поле недоступным, если не редактируемое
+                                onBlur={(e) => handleAdmiralBlur(e, ship.id, index)}
+                                disabled={!isEditable}
                             />
                         </div>
                     </div>
@@ -153,7 +172,8 @@ const FightPage = () => {
             <h1 className="fight-result-fix">Итог сражения</h1>
             <div className="result-section">
                 <input
-                    value={fight.result}
+                    defaultValue={fight.result}
+                    type="text"
                     className="fight-result-input"
                     onBlur={handleResultBlur}  // Добавляем обработчик потери фокуса
                     disabled={!isEditable}  // Сделать поле недоступным, если не редактируемое

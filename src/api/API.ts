@@ -108,11 +108,12 @@ const API = {
     },
 
     async changeAddFields(id:number, fight_name?: string, result?: string) {
+        console.log(id);
+        console.log(fight_name);
         const url = this.BASE_URL + `/fights/${id}/edit/`;
-        const body = {
-            figth_name: fight_name,
-            result: result
-        }
+        const body: any = {};
+        if (fight_name) body.fight_name = fight_name;
+        if (result) body.result = result;
 
         return Ajax.put({url, body})
     },
@@ -120,7 +121,7 @@ const API = {
     async changeShipFields(shipId: number, fightId: number, admiral?: string){
         const url = this.BASE_URL + `fights/${fightId}/ships/${shipId}/`;
         const body: any = {};
-        if (admiral) body.guest = admiral;
+        if (admiral) body.admiral = admiral;
 
         return Ajax.put({url, body})
     },
