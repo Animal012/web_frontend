@@ -1,4 +1,4 @@
-import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
 import shipsReducer from "./slices/shipsSlice";
 import userReducer from "./slices/userSlice";
 import fightReducer from "./slices/fightSlice";
@@ -15,5 +15,6 @@ const store = configureStore({
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+export type AppThunk = ThunkAction<void, RootState, unknown, Action<string>>;
 
 export default store;
