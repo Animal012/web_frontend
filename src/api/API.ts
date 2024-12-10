@@ -1,33 +1,10 @@
 import { SHIPS_MOCK } from "../modules/mock";
 "use strict";
 
-interface Ship {
-    id: string;
-    ship_name: string;
-    description: string;
-    year: number;
-    displacement: number;
-    length: number;
-    crew: number;
-    country: string;
-    photo: string;
-};
-
-interface RegisterParams {
-    username: string;
-    password: string;
-}
-
-interface LoginParams {
-    username: string;
-    password: string;
-}
-
-
 import Ajax from "./Ajax.ts";
 
 const API = {
-    BASE_URL: `http://192.168.13.113:3000/api`,
+    BASE_URL: `http://192.168.109.51:8000/`,
 
     // async login({ username, password }: LoginParams) {
     //     const url = this.BASE_URL + "/login/";
@@ -49,7 +26,7 @@ const API = {
     // },
 
     async getShips(){
-        const url = this.BASE_URL + "/ships/";
+        const url = this.BASE_URL + "ships/";
         try {
             const data = await Ajax.get(url);
             return data;
@@ -66,7 +43,7 @@ const API = {
     //},
 
     async getShipDetails(shipId: string) {
-        const url = this.BASE_URL + `/ships/${shipId}/`;
+        const url = this.BASE_URL + `ships/${shipId}/`;
         try {
             const data = await Ajax.get(url);
             return data;

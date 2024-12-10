@@ -57,6 +57,12 @@ const ShipPage = () => {
         return <div>Корабль не найден.</div>;
     }
 
+    if (error) {
+        return <div>Ошибка</div>;
+    }
+
+    const imageUrl = `http://192.168.109.51:9000/navy-sea/${ship.id}.jpg`;
+
     return (
         <div>
             <div className="breadcrumbs-ship">
@@ -70,7 +76,7 @@ const ShipPage = () => {
             <div className="ship-page">
                 <div className="ship-details">
                     <div className="ship-image-card">
-                        <img src={ship.photo} alt={ship.ship_name} />
+                        <img src={imageUrl} alt={ship.ship_name} />
                     </div>
                     <div className="ship-info">
                         <h1>{ship.ship_name}</h1>

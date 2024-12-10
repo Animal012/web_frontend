@@ -1,4 +1,3 @@
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
@@ -10,6 +9,7 @@ import { HomePage } from './pages/HomePage/HomePage';
 import Layout from './components/Layout/Layout';
 import store from './store';
 import { useEffect } from 'react';
+import { invoke } from '@tauri-apps/api/core';
 
 const router = createBrowserRouter([
   {
@@ -36,23 +36,21 @@ const router = createBrowserRouter([
       </Layout>
     ),
   },
-]);
+], {
+    basename: '/'
+});
 
 function App() {
   useEffect(() => {
-    if (window.TAURI) {
-      const { invoke } = window.TAURI.tauri;
+    invoke('create')
+      .then((response: any) => console.log('Create command response:', response))
+      .catch((error: any) => console.error('Error invoking create command:', error));
 
-      invoke('create')
-        .then((response: string) => console.log(response))
-        .catch((error: any) => console.error('Error:', error));
-
-      return () => {
-        invoke('close')
-          .then((response: string) => console.log(response))
-          .catch((error: any) => console.error('Error:', error));
-      };
-    }
+    return () => {
+      invoke('close')
+        .then((response: any) => console.log('Close command response:', response))
+        .catch((error: any) => console.error('Error invoking close command:', error));
+    };
   }, []);
 
   return (

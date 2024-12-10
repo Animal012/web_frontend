@@ -1,10 +1,5 @@
 'use strict';
 
-interface PostParams {
-    url: string;
-    body: object;
-}
-
 interface RequestParams {
     url: string;
     body?: object;
@@ -26,10 +21,6 @@ class Ajax {
         body = {},
     }: RequestParams): Promise<any> {
         const controller = new AbortController();
-        const timeout = 1000;
-        const timeoutId = setTimeout(() => {
-            controller.abort();
-        }, timeout);
 
         let request: Request;
         if (method === 'GET') {

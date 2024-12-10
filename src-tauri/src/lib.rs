@@ -10,7 +10,7 @@ pub fn run() {
         )?;
       }
       Ok(())
-    })
+    }).plugin(tauri_plugin_cors_fetch::init())
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }

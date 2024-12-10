@@ -21,9 +21,11 @@ const ShipCard: React.FC<{ ship: Ship }> = ({ ship }) => {
         navigate(`/ships/${ship.id}`);
     };
 
+    const imageUrl = `http://192.168.109.51:9000/navy-sea/${ship.id}.jpg`;
+
     return (
         <div className="ship-card">
-            <img src={ship.photo} className="ship-image" alt={`${ship.ship_name}`} />
+            <img src={imageUrl} className="ship-image" alt={`${ship.ship_name}`} />
             <h2 className="ship-name" onClick={handleTitleClick} style={{ cursor: "pointer" }}>
                 {ship.ship_name}
             </h2>
