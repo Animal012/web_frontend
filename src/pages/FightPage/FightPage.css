@@ -6,7 +6,7 @@
 }
 
 .fight-name-input {
-    width: 55%;
+    width: 35%;
     height: 22px;
     padding: 10px;
     border: 1px solid #ccc;
@@ -37,17 +37,35 @@
     border-radius: 10px;
     padding: 10px;
     background-color: white;
-    display: flex;
+    display: flex; /* Устанавливаем flex для размещения контента в строку */
     flex-direction: column;
-    width: 300px;
+    width: 60%; /* Фиксированная ширина карточки */
     align-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    overflow: hidden;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+.ship-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.ship-content {
+    display: flex; /* Flex-контейнер для фото и информации */
+    align-items: center; /* Выравнивание по вертикали */
+    gap: 15px; /* Отступ между фото и текстом */
 }
 
 .ship-photo {
-    width: 100%;
-    height: auto;
+    width: 120px; /* Ширина фото */
+    height: 120px; /* Высота фото */
     border-radius: 5px;
-    margin-bottom: 10px;
 }
 
 .ship-info-fight h4 {
@@ -70,7 +88,7 @@
 }
 
 .fight-result-input {
-    width: 55%;
+    width: 35%;
     height: 22px;
     padding: 10px;
     border: 1px solid #ccc;
@@ -101,14 +119,11 @@
 }
 
 .battle-row {
+    width: 70%;
     display: flex;
     gap: 20px; /* Расстояние между карточкой корабля и адмирала */
     align-items: center; /* Выравнивание по вертикали */
     margin: 0 auto;
-}
-
-.ship-card {
-    width: 300px;
 }
 
 .admiral-card {
@@ -122,13 +137,6 @@
     border-radius: 5px;
     width: 100%;
     padding: 5px;
-}
-
-.ship-card {
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    padding: 10px;
-    background-color: white;
 }
 
 .ship-photo {
@@ -152,6 +160,19 @@
     color: white; /* Белый текст */
 }
 
+.ship-delete {
+    display: block; /* Чтобы кнопки встали по центру */
+    width: 70%; /* 20% ширины экрана */
+    margin: 10px auto; /* Центрирование по горизонтали и небольшой отступ между кнопками */
+    padding: 10px 0;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    color: white; /* Белый текст */
+}
+
 .fight-submit {
     background-color: #007bff; /* Синий цвет */
 }
@@ -165,6 +186,14 @@
 }
 
 .fight-delete:hover {
+    background-color: #a71d2a; /* Более темный красный при наведении */
+}
+
+.ship-delete {
+    background-color: #dc3545; /* Красный цвет */
+}
+
+.ship-delete:hover {
     background-color: #a71d2a; /* Более темный красный при наведении */
 }
 

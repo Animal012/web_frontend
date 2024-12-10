@@ -45,7 +45,7 @@ const ShipCard: React.FC<{ ship: Ship }> = ({ ship }) => {
     };
 
     return (
-        <div className="ship-card">
+        <div className="ship-card-shippage">
             <img src={ship.photo} className="ship-image" alt={`${ship.ship_name}`} />
             <h2 className="ship-name" onClick={handleTitleClick} style={{ cursor: "pointer" }}>
                 {ship.ship_name}

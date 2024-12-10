@@ -1,4 +1,4 @@
-.ship-card {
+.ship-card-shippage {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -13,7 +13,7 @@
     padding: 10px;
 }
 
-.ship-card img {
+.ship-card-shippage img {
     width: 100%;
     height: 150px;
     object-fit: cover;

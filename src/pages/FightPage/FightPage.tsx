@@ -132,30 +132,40 @@ const FightPage = () => {
         <div className="fight-page">
             <h1 className="fight-name-fix">Название сражения</h1>
             <input
-                defaultValue={fight.fight_name}  // Используйте правильное значение
+                defaultValue={fight.fight_name}
                 type="text"
                 className="fight-name-input"
-                onBlur={handleFightNameBlur}  // Добавляем обработчик потери фокуса
-                disabled={!isEditable}  // Сделать поле недоступным, если не редактируемое
+                onBlur={handleFightNameBlur}
+                disabled={!isEditable}
+            />
+            <h1 className="fight-result-fix">Итог сражения</h1>
+            <input
+                defaultValue={fight.result}
+                type="text"
+                className="fight-result-input"
+                onBlur={handleResultBlur}
+                disabled={!isEditable}
             />
             <div className="battle-container">
                 {fight.ships.map(({ ship, admiral }, index) => (
                     <div key={index} className="battle-row">
                         {/* Карточка корабля */}
                         <div className="ship-card">
-                            <img src={ship.photo} alt={ship.ship_name} className="ship-photo" />
-                            <div className="ship-info-fight">
-                                <h1>{ship.ship_name}</h1>
-                                <h4><strong>Экипаж:</strong> {ship.crew}</h4>
-                                {isEditable && (
-                                    <button className="fight-delete" onClick={() => handleShipDelete(ship.id, index)}>
-                                        Удалить
-                                    </button>
-                                )}
+                            <div className="ship-content">
+                                <img src={ship.photo} alt={ship.ship_name} className="ship-photo" />
+                                <div className="ship-info">
+                                    <h1>{ship.ship_name}</h1>
+                                    <h4><strong>Экипаж:</strong> {ship.crew}</h4>
+                                    {isEditable && (
+                                        <button className="ship-delete" onClick={() => handleShipDelete(ship.id, index)}>
+                                            Удалить
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
-                        {/* Карточка адмирала */}
+                        {/* Поле адмирала */}
                         <div className="admiral-card">
                             <h2>Адмирал</h2>
                             <input
@@ -169,32 +179,15 @@ const FightPage = () => {
                     </div>
                 ))}
             </div>
-            <h1 className="fight-result-fix">Итог сражения</h1>
-            <div className="result-section">
-                <input
-                    defaultValue={fight.result}
-                    type="text"
-                    className="fight-result-input"
-                    onBlur={handleResultBlur}  // Добавляем обработчик потери фокуса
-                    disabled={!isEditable}  // Сделать поле недоступным, если не редактируемое
-                />
-            </div>
             <div className="button-container">
                 {isEditable ? (
                     <>
-                    <button className="fight-submit" onClick={handleSubmit}>
-                        Оформить
-                    </button>
-                    <button className="fight-delete" onClick={handleDelete}>
-                        Удалить
-                    </button>
+                        <button className="fight-submit" onClick={handleSubmit}>Оформить</button>
+                        <button className="fight-delete" onClick={handleDelete}>Удалить</button>
                     </>
-                ) : (
-                    <>
-                    </>
-                )}
+                ) : null}
             </div>
-            {!isEditable && fight.sailors != null && (
+            {!isEditable && fight.sailors !== null && (
                 <div className="total-sailors">
                     Общее количество участников сражения: {fight.sailors}
                 </div>

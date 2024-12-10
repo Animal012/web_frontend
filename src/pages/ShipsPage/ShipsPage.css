@@ -74,6 +74,10 @@
     justify-content: center;
 }
 
+.ship-card {
+    width: 300px;
+}
+
 @media (max-width: 400px) {
     .ship-card-container {
         width: 66.7%;
