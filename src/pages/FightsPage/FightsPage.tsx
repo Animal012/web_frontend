@@ -4,40 +4,60 @@ import { useNavigate } from 'react-router-dom';
 import './FightsPage.css';
 
 interface Fight {
-    id: string;
-    fight_name: string;
-    result: string;
-    sailors: number;
-    created_at: string;
-    formed_at: string;
-    completed_at: string;
-    status: string;
-    creator: number;
+  id: string;
+  fight_name: string;
+  result: string;
+  sailors: number | null; // Обновление: допускаем, что поле может быть пустым
+  created_at: string;
+  formed_at: string;
+  completed_at: string;
+  status: string;
 }
 
 const FightsPage = () => {
   const [fights, setFights] = useState<Fight[]>([]);
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
-  const [status, setStatus] = useState('');
+  const [filteredFights, setFilteredFights] = useState<Fight[]>([]);
+  const [dateFrom, setDateFrom] = useState<string>('');
+  const [dateTo, setDateTo] = useState<string>('');
+  const [status, setStatus] = useState<string>('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchFights = async () => {
-      try {
-        const response = await API.getFights({ date_from: dateFrom, date_to: dateTo, status });
-        const data: Fight[] = await response.json();
-        setFights(data);
-      } catch (error) {
-        console.error('Ошибка при загрузке сражений:', error);
-      }
-    };
+  // Загрузка данных
+  const fetchFights = async () => {
+    try {
+      const response = await API.getFights({ status });
+      const data = (await response.json()) as Fight[];
+      setFights(data);
+      setFilteredFights(data);
+    } catch (error) {
+      console.error('Ошибка при загрузке сражений:', error);
+    }
+  };
 
+  useEffect(() => {
     fetchFights();
-  }, [dateFrom, dateTo, status]);
+  }, [status]);
+
+  // Фильтрация по дате
+  useEffect(() => {
+    const filtered = fights.filter((fight) => {
+      const createdDate = fight.created_at.split('T')[0]; // Оставляем только YYYY-MM-DD
+      const fromDate = dateFrom ? new Date(dateFrom) : null;
+      const toDate = dateTo ? new Date(dateTo) : null;
+
+      const fightDate = new Date(createdDate);
+
+      return (
+        (!fromDate || fightDate >= fromDate) &&
+        (!toDate || fightDate <= toDate)
+      );
+    });
+
+    setFilteredFights(filtered);
+  }, [dateFrom, dateTo, fights]);
 
   const formatDate = (dateString: string): string =>
-    dateString ? new Date(dateString).toLocaleString() : '—';
+    dateString ? dateString.split('T')[0] : '—'; // Обрезаем до YYYY-MM-DD
 
   const getStatusText = (status: string): string => {
     switch (status) {
@@ -52,32 +72,38 @@ const FightsPage = () => {
     }
   };
 
-  const handleRowClick = (id: string) => {
-    navigate(`/fights/${id}`);
-  };
+  const getSailorsText = (sailors: number | null): string =>
+    sailors && sailors > 0 ? sailors.toString() : '—'; // Условие для пустого или нулевого значения
 
   return (
     <div className="fights-page">
       <h1>Ваши сражения</h1>
       <div className="filters">
-        <label className='fights-page-label'>
+        <label>
+          Дата от:
           <input
             type="date"
+            className="fights-page-input"
             value={dateFrom}
-            className='fights-page-input'
             onChange={(e) => setDateFrom(e.target.value)}
           />
         </label>
-        <label className='fights-page-label'>
+        <label>
+          Дата до:
           <input
             type="date"
+            className="fights-page-input"
             value={dateTo}
-            className='fights-page-input'
             onChange={(e) => setDateTo(e.target.value)}
           />
         </label>
-        <label className='fights-page-label'>
-          <select value={status} className='fights-page-select' onChange={(e) => setStatus(e.target.value)}>
+        <label>
+          Статус:
+          <select
+            className="fights-page-select"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
             <option value="">Все</option>
             <option value="f">В работе</option>
             <option value="c">Завершена</option>
@@ -85,31 +111,45 @@ const FightsPage = () => {
           </select>
         </label>
       </div>
-      <table className="fights-table">
-        <thead>
-          <tr>
-            <th>№</th>
-            <th>Статус</th>
-            <th>Дата создания</th>
-            <th>Дата формирования</th>
-            <th>Дата завершения</th>
-          </tr>
-        </thead>
-        <tbody>
-          {fights.map((fight) => (
-            <tr
-              key={fight.id}
-              onClick={() => handleRowClick(fight.id)}
-            >
-              <td>{fight.id}</td>
-              <td>{getStatusText(fight.status)}</td>
-              <td>{formatDate(fight.created_at)}</td>
-              <td>{formatDate(fight.formed_at)}</td>
-              <td>{formatDate(fight.completed_at)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+
+      <div className="fights-list">
+        {filteredFights.map((fight) => (
+          <div
+            key={fight.id}
+            className="fight-row"
+            onClick={() => navigate(`/fights/${fight.id}`)}
+          >
+            <div className="fight-row-section">
+              <strong>№</strong>
+              <div>{fight.id}</div>
+            </div>
+            <div className="fight-row-section">
+              <strong>Название</strong>
+              <div>{fight.fight_name}</div>
+            </div>
+            <div className="fight-row-section">
+              <strong>Статус</strong>
+              <div>{getStatusText(fight.status)}</div>
+            </div>
+            <div className="fight-row-section">
+              <strong>Общее количество моряков</strong>
+              <div>{getSailorsText(fight.sailors)}</div>
+            </div>
+            <div className="fight-row-section">
+              <strong>Дата создания</strong>
+              <div>{formatDate(fight.created_at)}</div>
+            </div>
+            <div className="fight-row-section">
+              <strong>Дата формирования</strong>
+              <div>{formatDate(fight.formed_at)}</div>
+            </div>
+            <div className="fight-row-section">
+              <strong>Дата завершения</strong>
+              <div>{formatDate(fight.completed_at)}</div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
