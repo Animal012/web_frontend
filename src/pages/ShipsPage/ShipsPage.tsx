@@ -7,6 +7,7 @@ import { BreadCrumbs } from "../../components/BreadCrumbs/BreadCrumbs";
 import { ROUTE_LABELS } from "../../Route";
 import { SHIPS_MOCK } from "../../modules/mock";
 import { setDraftFight } from "../../slices/fightSlice"; 
+import { selectSearchQuery, setSearchQuery } from "../../slices/shipsSlice"; // Импортируем новый экшен и селектор
 import { RootState } from "../../store";
 import "./ShipsPage.css";
 
@@ -26,9 +27,9 @@ const ShipsPage: FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { count, draftFightId } = useSelector((state: RootState) => state.fight);
+    const searchQuery = useSelector(selectSearchQuery); // Получаем строку поиска из Redux
 
     const [ships, setShips] = useState<Ship[]>([]);
-    const [searchQuery, setSearchQuery] = useState("");
 
     const getShips = async () => {
         try {
@@ -54,7 +55,7 @@ const ShipsPage: FC = () => {
     );
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchQuery(e.target.value);
+        dispatch(setSearchQuery(e.target.value)); // Обновляем строку поиска в Redux
     };
 
     const handleGoToFight = () => {
@@ -73,7 +74,7 @@ const ShipsPage: FC = () => {
                     type="text"
                     className="search-input"
                     placeholder="Введите название"
-                    value={searchQuery}
+                    value={searchQuery} // Используем строку поиска из Redux
                     onChange={handleSearchChange}
                 />
                 <div
