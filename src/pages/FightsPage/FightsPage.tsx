@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
-import API from '../../api/API';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux'; // Для получения состояния isStaff
+import API from '../../api/API';
+import { RootState } from "../../store";
 import './FightsPage.css';
 
 interface Fight {
   id: string;
   fight_name: string;
   result: string;
-  sailors: number | null; // Обновление: допускаем, что поле может быть пустым
+  sailors: number | null;
   created_at: string;
   formed_at: string;
   completed_at: string;
@@ -21,6 +23,11 @@ const FightsPage = () => {
   const [dateTo, setDateTo] = useState<string>('');
   const [status, setStatus] = useState<string>('');
   const navigate = useNavigate();
+
+  // Получаем значение isStaff из состояния Redux с проверкой на undefined
+  //const isStaff = useSelector((state: any) => state.user.isStaff ?? false);
+  const { isStaff } = useSelector((state: RootState) => state.user);
+  console.log('isStaff:', isStaff);
 
   // Загрузка данных
   const fetchFights = async () => {
@@ -41,7 +48,7 @@ const FightsPage = () => {
   // Фильтрация по дате
   useEffect(() => {
     const filtered = fights.filter((fight) => {
-      const createdDate = fight.created_at.split('T')[0]; // Оставляем только YYYY-MM-DD
+      const createdDate = fight.created_at.split('T')[0];
       const fromDate = dateFrom ? new Date(dateFrom) : null;
       const toDate = dateTo ? new Date(dateTo) : null;
 
@@ -57,7 +64,7 @@ const FightsPage = () => {
   }, [dateFrom, dateTo, fights]);
 
   const formatDate = (dateString: string): string =>
-    dateString ? dateString.split('T')[0] : '—'; // Обрезаем до YYYY-MM-DD
+    dateString ? dateString.split('T')[0] : '—';
 
   const getStatusText = (status: string): string => {
     switch (status) {
@@ -73,7 +80,17 @@ const FightsPage = () => {
   };
 
   const getSailorsText = (sailors: number | null): string =>
-    sailors && sailors > 0 ? sailors.toString() : '—'; // Условие для пустого или нулевого значения
+    sailors && sailors > 0 ? sailors.toString() : '—';
+
+  const handleAccept = (id: string) => {
+    // Логика для принятия сражения
+    console.log(`Принято сражение с ID: ${id}`);
+  };
+
+  const handleReject = (id: string) => {
+    // Логика для отклонения сражения
+    console.log(`Отклонено сражение с ID: ${id}`);
+  };
 
   return (
     <div className="fights-page">
@@ -147,6 +164,14 @@ const FightsPage = () => {
               <strong>Дата завершения</strong>
               <div>{formatDate(fight.completed_at)}</div>
             </div>
+
+            {/* Кнопки Принять и Отклонить, если isStaff и статус "В работе" */}
+            {isStaff && fight.status === 'f' && (
+              <div className="fight-row-buttons">
+                <button onClick={() => handleAccept(fight.id)}>Принять</button>
+                <button onClick={() => handleReject(fight.id)}>Отклонить</button>
+              </div>
+            )}
           </div>
         ))}
       </div>

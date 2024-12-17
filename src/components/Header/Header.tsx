@@ -20,7 +20,7 @@ const Header: FC = () => {
         const response = await API.getSession();
         const data = await response.json();
         if (data.status === "ok" && data.username) {
-          dispatch(login(data.username));
+          dispatch(login({ username: data.username, isStaff: data.isStaff })); // Убедитесь, что данные правильно передаются в Redux
         }
       };
       checkSession();
@@ -34,7 +34,7 @@ const Header: FC = () => {
     deleteCookie("session_id");
     navigate("/");
   };
-
+  
   return (
     <nav className="header">
       <Link to="/">
