@@ -190,6 +190,30 @@ class API {
         return this.safeRequest(this.getInstance().delete(`ships/${shipId}/`));
     }
 
+    static async changeShip(shipId: number, ship_name?: string, description?: string, year?: number, length?: number, displacement?: number, crew?: number, country?: string) {
+        const body: Record<string, any> = {};
+        if (ship_name) body.ship_name = ship_name;
+        if (description) body.description = description;
+        if (year) body.year = year;
+        if (length) body.length = length;
+        if (displacement) body.displacement = displacement;
+        if (crew) body.crew = crew;
+        if (country) body.country = country;
+        return this.safeRequest(this.getInstance().put(`ships/${shipId}/`, body));
+    }
+
+    static async addShip(ship_name?: string, description?: string, year?: number, length?: number, displacement?: number, crew?: number, country?: string) {
+        const body: Record<string, any> = {};
+        if (ship_name) body.ship_name = ship_name;
+        if (description) body.description = description;
+        if (year) body.year = year;
+        if (length) body.length = length;
+        if (displacement) body.displacement = displacement;
+        if (crew) body.crew = crew;
+        if (country) body.country = country;
+        return this.safeRequest(this.getInstance().post(`ships/`, body));
+    }
+
     static async updateProfile(email?: string, password?: string) {
         const body: Record<string, any> = {};
         if (email) body.email = email;

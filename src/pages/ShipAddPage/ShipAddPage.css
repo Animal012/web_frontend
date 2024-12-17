@@ -1,0 +1,86 @@
+.ship-page {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.ship-details {
+    display: flex;
+    padding-top: 20px;
+}
+
+.ship-image-card {
+    margin-right: 50px;
+}
+
+.ship-image-card img {
+    max-width: 400px;
+    height: auto;
+    display: block;
+}
+
+.ship-info {
+    max-width: 400px;
+}
+
+.ship-info p {
+    font-size: 20px;
+    line-height: 1.5;
+    margin: 5px 0;
+}
+
+.ship-info strong {
+    font-weight: bold;
+}
+
+.loading-gif {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+}
+
+.ship-save-edit,
+.ship-change-photo {
+    display: block; /* Чтобы кнопки встали по центру */
+    width: 200px; /* 20% ширины экрана */
+    margin: 10px auto; /* Центрирование по горизонтали и небольшой отступ между кнопками */
+    padding: 10px 0;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    color: white; /* Белый текст */
+}
+
+.ship-save-edit {
+  background-color: #007bff; /* Синий цвет */
+}
+
+.ship-save-edit:hover {
+  background-color: #0056b3; /* Более темный синий при наведении */
+}
+
+.ship-change-photo {
+  background-color: #fff200; /* Красный цвет */
+}
+
+.ship-change-photo:hover {
+  background-color: #d8cb10; /* Более темный красный при наведении */
+}
+
+.ship-edit-input, .ship-edit-textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: all 0.3s ease-in-out;
+  }

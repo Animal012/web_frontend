@@ -117,6 +117,13 @@ const ShipsModerPage: FC = () => {
                 />
             </div>
             <div>
+                <div>
+                    <Link 
+                        to={`/add-ships`} 
+                        className="ship-add-button">
+                        Добавить новый корабль
+                    </Link>
+                </div>
                 {filteredShips.length === 0 ? (
                     <div>К сожалению, ничего не найдено :(</div>
                 ) : (

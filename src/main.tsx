@@ -15,6 +15,8 @@ import FightPage from './pages/FightPage/FightPage';
 import FightsPage from './pages/FightsPage/FightsPage';
 import ErrorPage from './pages/ErrorPage/ErrorPage';
 import ShipsModerPage from './pages/ShipsModerPage/ShipsModerPage';
+import ShipEditPage from './pages/ShipEditPage/ShipEditPage';
+import ShipAddPage from './pages/ShipAddPage/ShipAddPage';
 
 // Функция для получения и установки CSRF-токена
 async function initializeCsrfToken() {
@@ -99,6 +101,22 @@ const router = createBrowserRouter(
       element: (
         <Layout>
           <ShipsModerPage />
+        </Layout>
+      ),
+    },
+    {
+      path: '/edit-ships/:shipId',
+      element: (
+        <Layout>
+          <ShipEditPage />
+        </Layout>
+      ),
+    },
+    {
+      path: '/add-ships',
+      element: (
+        <Layout>
+          <ShipAddPage />
         </Layout>
       ),
     },

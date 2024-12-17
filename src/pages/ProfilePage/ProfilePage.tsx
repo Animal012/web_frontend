@@ -20,7 +20,7 @@ const ProfilePage = () => {
 
     try {
       await API.updateProfile(email, password || undefined);
-      dispatch(login(email));
+      dispatch(login({ username: email, isStaff: false }));
       setPassword("");
       alert("Данные успешно обновлены.");
     } catch (err: any) {
