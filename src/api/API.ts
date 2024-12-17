@@ -85,7 +85,15 @@ class API {
     }
 
     static async getSession() {
-        return this.safeRequest(this.getInstance().get("users/check/"));
+        const response = await this.safeRequest(this.getInstance().get("users/check/"));
+        if (response.ok) {
+            const data = await response.json();
+            return { 
+                username: data.username, 
+                isStaff: data.is_staff 
+            };
+        }
+        return { username: null, isStaff: false };
     }
 
     static async getShips(postfix?: string) {
@@ -139,6 +147,14 @@ class API {
 
     static async formFight(fightId: number) {
         return this.safeRequest(this.getInstance().put(`fights/${fightId}/form/`, { status: "f" }));
+    }
+
+    static async completeFight(fightId: number) {
+        return this.safeRequest(this.getInstance().put(`fights/${fightId}/complete/`, { status: "c" }));
+    }
+
+    static async rejectedFight(fightId: number) {
+        return this.safeRequest(this.getInstance().put(`fights/${fightId}/complete/`, { status: "r" }));
     }
 
     static async deleteFight(fightId: number) {

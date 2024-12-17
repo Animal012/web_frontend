@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux'; // Для получения состояния isStaff
-import API from '../../api/API';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import API from "../../api/API";
 import { RootState } from "../../store";
-import './FightsPage.css';
+import "./FightsPage.css";
 
 interface Fight {
   id: string;
@@ -14,22 +14,20 @@ interface Fight {
   formed_at: string;
   completed_at: string;
   status: string;
+  creator: string;
 }
 
 const FightsPage = () => {
   const [fights, setFights] = useState<Fight[]>([]);
   const [filteredFights, setFilteredFights] = useState<Fight[]>([]);
-  const [dateFrom, setDateFrom] = useState<string>('');
-  const [dateTo, setDateTo] = useState<string>('');
-  const [status, setStatus] = useState<string>('');
+  const [dateFrom, setDateFrom] = useState<string>("");
+  const [dateTo, setDateTo] = useState<string>("");
+  const [status, setStatus] = useState<string>("");
+  const [authorFilter, setAuthorFilter] = useState<string>(""); // Состояние для автора
   const navigate = useNavigate();
 
-  // Получаем значение isStaff из состояния Redux с проверкой на undefined
-  //const isStaff = useSelector((state: any) => state.user.isStaff ?? false);
   const { isStaff } = useSelector((state: RootState) => state.user);
-  console.log('isStaff:', isStaff);
 
-  // Загрузка данных
   const fetchFights = async () => {
     try {
       const response = await API.getFights({ status });
@@ -37,7 +35,7 @@ const FightsPage = () => {
       setFights(data);
       setFilteredFights(data);
     } catch (error) {
-      console.error('Ошибка при загрузке сражений:', error);
+      console.error("Ошибка при загрузке сражений:", error);
     }
   };
 
@@ -45,57 +43,85 @@ const FightsPage = () => {
     fetchFights();
   }, [status]);
 
-  // Фильтрация по дате
   useEffect(() => {
     const filtered = fights.filter((fight) => {
-      const createdDate = fight.created_at.split('T')[0];
+      const fightDate = new Date(fight.created_at);
       const fromDate = dateFrom ? new Date(dateFrom) : null;
       const toDate = dateTo ? new Date(dateTo) : null;
 
-      const fightDate = new Date(createdDate);
-
       return (
         (!fromDate || fightDate >= fromDate) &&
-        (!toDate || fightDate <= toDate)
+        (!toDate || fightDate <= toDate) &&
+        (!authorFilter || fight.creator.toLowerCase().includes(authorFilter.toLowerCase()))
       );
     });
 
     setFilteredFights(filtered);
-  }, [dateFrom, dateTo, fights]);
+  }, [dateFrom, dateTo, authorFilter, fights]);
 
   const formatDate = (dateString: string): string =>
-    dateString ? dateString.split('T')[0] : '—';
+    dateString ? dateString.split("T")[0] : "—";
 
   const getStatusText = (status: string): string => {
     switch (status) {
-      case 'f':
-        return 'В работе';
-      case 'c':
-        return 'Завершена';
-      case 'r':
-        return 'Отклонена';
+      case "f":
+        return "В работе";
+      case "c":
+        return "Завершена";
+      case "r":
+        return "Отклонена";
       default:
-        return 'Неизвестен';
+        return "Неизвестен";
     }
   };
 
   const getSailorsText = (sailors: number | null): string =>
-    sailors && sailors > 0 ? sailors.toString() : '—';
+    sailors && sailors > 0 ? sailors.toString() : "—";
 
-  const handleAccept = (id: string) => {
-    // Логика для принятия сражения
-    console.log(`Принято сражение с ID: ${id}`);
+  const handleAccept = async (id: string) => {
+    try {
+      const response = await API.completeFight(parseInt(id));
+      if (response.ok) {
+        console.log(`Сражение с ID ${id} успешно завершено.`);
+        fetchFights();
+      } else {
+        console.error(`Не удалось завершить сражение с ID ${id}:`, response);
+      }
+    } catch (error) {
+      console.error(`Ошибка при завершении сражения с ID ${id}:`, error);
+    }
   };
 
-  const handleReject = (id: string) => {
-    // Логика для отклонения сражения
-    console.log(`Отклонено сражение с ID: ${id}`);
+  const handleReject = async (id: string) => {
+    try {
+      const response = await API.rejectedFight(parseInt(id));
+      if (response.ok) {
+        console.log(`Сражение с ID ${id} успешно отклонено.`);
+        fetchFights();
+      } else {
+        console.error(`Не удалось отклонить сражение с ID ${id}:`, response);
+      }
+    } catch (error) {
+      console.error(`Ошибка при отклонении сражения с ID ${id}:`, error);
+    }
   };
 
   return (
     <div className="fights-page">
       <h1>Ваши сражения</h1>
       <div className="filters">
+        {isStaff && (
+          <label>
+            Автор:
+            <input
+              type="text"
+              className="fights-page-input"
+              value={authorFilter}
+              onChange={(e) => setAuthorFilter(e.target.value)}
+              placeholder="Введите автора"
+            />
+          </label>
+        )}
         <label>
           Дата от:
           <input
@@ -165,11 +191,33 @@ const FightsPage = () => {
               <div>{formatDate(fight.completed_at)}</div>
             </div>
 
-            {/* Кнопки Принять и Отклонить, если isStaff и статус "В работе" */}
-            {isStaff && fight.status === 'f' && (
+            {isStaff && (
+              <div className="fight-row-section">
+                <strong>Создатель</strong>
+                <div>{fight.creator}</div>
+              </div>
+            )}
+
+            {isStaff && fight.status === "f" && (
               <div className="fight-row-buttons">
-                <button onClick={() => handleAccept(fight.id)}>Принять</button>
-                <button onClick={() => handleReject(fight.id)}>Отклонить</button>
+                <button
+                  className="fight-complete"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAccept(fight.id);
+                  }}
+                >
+                  Принять
+                </button>
+                <button
+                  className="fight-reject"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleReject(fight.id);
+                  }}
+                >
+                  Отклонить
+                </button>
               </div>
             )}
           </div>

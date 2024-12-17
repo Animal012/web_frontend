@@ -10,17 +10,25 @@ import { getCookie, deleteCookie } from "../../api/Utils";
 
 const Header: FC = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Хук для навигации
+  const navigate = useNavigate();
   const { isLoggedIn, userName } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     const sessionId = getCookie("session_id");
     if (sessionId) {
       const checkSession = async () => {
-        const response = await API.getSession();
-        const data = await response.json();
-        if (data.status === "ok" && data.username) {
-          dispatch(login({ username: data.username, isStaff: data.isStaff })); // Убедитесь, что данные правильно передаются в Redux
+        try {
+          const sessionData = await API.getSession();
+          if (sessionData.username) {
+            dispatch(
+              login({ username: sessionData.username, isStaff: sessionData.isStaff })
+            ); // Обновляем Redux с новыми данными
+          } else {
+            dispatch(logout());
+          }
+        } catch (error) {
+          console.error("Ошибка при проверке сессии:", error);
+          dispatch(logout());
         }
       };
       checkSession();
@@ -28,13 +36,17 @@ const Header: FC = () => {
   }, [dispatch]);
 
   const handleLogout = async () => {
-    dispatch(logout());
-    dispatch(resetFilters());
-    await API.logout();
-    deleteCookie("session_id");
-    navigate("/");
+    try {
+      await API.logout();
+      deleteCookie("session_id");
+      dispatch(logout());
+      dispatch(resetFilters());
+      navigate("/"); // Переход на главную страницу
+    } catch (error) {
+      console.error("Ошибка при выходе из системы:", error);
+    }
   };
-  
+
   return (
     <nav className="header">
       <Link to="/">
@@ -45,8 +57,12 @@ const Header: FC = () => {
         <Link to="/fights">Сражения</Link>
         {isLoggedIn ? (
           <>
-            <Link to="/profile"><span>{userName}</span></Link>
-            <button onClick={handleLogout} className="button-exit">Выйти</button>
+            <Link to="/profile">
+              <span>{userName}</span>
+            </Link>
+            <button onClick={handleLogout} className="button-exit">
+              Выйти
+            </button>
           </>
         ) : (
           <Link to="/auth">

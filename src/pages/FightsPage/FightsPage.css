@@ -82,3 +82,33 @@ h1 {
   font-weight: bold;
   color: #333;
 }
+
+.fight-complete,
+.fight-reject {
+    display: block; /* Чтобы кнопки встали по центру */
+    width: 90px; /* 20% ширины экрана */
+    margin: 10px auto; /* Центрирование по горизонтали и небольшой отступ между кнопками */
+    padding: 10px 0;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    color: white; /* Белый текст */
+}
+
+.fight-complete {
+  background-color: #007bff; /* Синий цвет */
+}
+
+.fight-complete:hover {
+  background-color: #0056b3; /* Более темный синий при наведении */
+}
+
+.fight-reject {
+  background-color: #dc3545; /* Красный цвет */
+}
+
+.fight-reject:hover {
+  background-color: #a71d2a; /* Более темный красный при наведении */
+}
