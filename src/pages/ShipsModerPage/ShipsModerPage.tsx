@@ -120,7 +120,7 @@ const ShipsModerPage: FC = () => {
                 <div>
                     <Link 
                         to={`/add-ships`} 
-                        className="ship-add-button">
+                        className="ship-add-button-moder">
                         Добавить новый корабль
                     </Link>
                 </div>

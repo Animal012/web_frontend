@@ -54,7 +54,7 @@
 
 .ship-edit-button,
 .ship-delete-button,
-.ship-add-button {
+.ship-add-button-moder {
     display: block; /* Чтобы кнопки встали по центру */
     width: 130px; /* 20% ширины экрана */
     margin: 10px auto; /* Центрирование по горизонтали и небольшой отступ между кнопками */
@@ -72,7 +72,7 @@
   text-decoration: none;
 }
 
-.ship-add-button {
+.ship-add-button-moder {
   background-color: #007bff;
   text-decoration: none;
   font-size: 20px !important;
@@ -80,7 +80,7 @@
 }
 
 .ship-edit-button:hover,
-.ship-add-button:hover {
+.ship-add-button-moder:hover {
   background-color: #0056b3; /* Более темный синий при наведении */
 }
 

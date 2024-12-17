@@ -41,6 +41,8 @@ const FightsPage = () => {
 
   useEffect(() => {
     fetchFights();
+    const intervalId = setInterval(fetchFights, 5000);
+    return () => clearInterval(intervalId);
   }, [status]);
 
   useEffect(() => {
