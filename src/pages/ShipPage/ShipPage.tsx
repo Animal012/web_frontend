@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { api } from "../../api/index"
+import { useParams, useNavigate } from "react-router-dom";
+import { api } from "../../api/index";
 import { BreadCrumbs } from "../../components/BreadCrumbs/BreadCrumbs";
 import { ROUTE_LABELS } from "../../Route";
 import { SHIPS_MOCK } from "../../modules/mock";
@@ -20,6 +20,7 @@ interface Ship {
 
 const ShipPage = () => {
     const { shipId } = useParams<{ shipId: string }>();
+    const navigate = useNavigate(); // Получаем функцию для навигации
     const [ship, setShip] = useState<Ship | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -41,6 +42,8 @@ const ShipPage = () => {
                     setError(null);
                 } else {
                     setError("Корабль не найден в mock-данных");
+                    // Редирект на страницу 404 при ошибке
+                    navigate(`/error/404`, { replace: true });
                 }
             } finally {
                 setLoading(false);
@@ -48,17 +51,17 @@ const ShipPage = () => {
         };
     
         getShipDetails();
-    }, [shipId]);
-    
+    }, [shipId, navigate]); // Добавляем navigate в зависимости
+
     if (loading) 
         return <div className="loading-gif">
-                    <img src="/loading.webp"></img>
+                    <img src="/loading.webp" alt="Loading" />
                 </div>;
-    
+
     if (error) {
         return <div>{error}</div>;
     }
-    
+
     if (!ship) {
         return <div>Корабль не найден.</div>;
     }    

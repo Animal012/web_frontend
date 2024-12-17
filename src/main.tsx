@@ -13,6 +13,7 @@ import store from './store';
 import API from "./api/API";
 import FightPage from './pages/FightPage/FightPage';
 import FightsPage from './pages/FightsPage/FightsPage';
+import ErrorPage from './pages/ErrorPage/ErrorPage';
 
 // Функция для получения и установки CSRF-токена
 async function initializeCsrfToken() {
@@ -81,6 +82,14 @@ const router = createBrowserRouter(
       element: (
         <Layout>
           <FightsPage />
+        </Layout>
+      ),
+    },
+    {
+      path: '/error/:errorCode',
+      element: (
+        <Layout>
+          <ErrorPage />
         </Layout>
       ),
     },
