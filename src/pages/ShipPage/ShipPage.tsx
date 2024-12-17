@@ -4,6 +4,8 @@ import { api } from "../../api/index";
 import { BreadCrumbs } from "../../components/BreadCrumbs/BreadCrumbs";
 import { ROUTE_LABELS } from "../../Route";
 import { SHIPS_MOCK } from "../../modules/mock";
+import { RootState } from "../../store";
+import { useSelector } from "react-redux";
 import "./ShipPage.css";
 
 interface Ship {
@@ -24,6 +26,7 @@ const ShipPage = () => {
     const [ship, setShip] = useState<Ship | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { isStaff } = useSelector((state: RootState) => state.user);
 
     useEffect(() => {
         const getShipDetails = async () => {
@@ -71,7 +74,8 @@ const ShipPage = () => {
             <div className="breadcrumbs-ship">
                 <BreadCrumbs
                     crumbs={[
-                        { label: ROUTE_LABELS.SHIPS, path: '/ships' },
+                        { label: isStaff ? ROUTE_LABELS.MODER_SHIPS : ROUTE_LABELS.SHIPS,
+                            path: isStaff ? "/moderator-ships" : "/ships", },
                         { label: ship.ship_name || "Корабль" },
                     ]}
                 />

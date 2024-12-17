@@ -30,7 +30,7 @@ const Auth: FC = () => {
   
           if (authData.status === "ok") {
             dispatch(login({ username: authData.username, isStaff: authData.isStaff }));
-            navigate("/ships");
+            navigate("/");
           } else {
             console.log("Ошибка при авторизации");
           }
@@ -43,7 +43,7 @@ const Auth: FC = () => {
   
         if (data.status === "ok") {
           dispatch(login({ username: data.username, isStaff: data.isStaff }));
-          navigate("/ships");
+          navigate("/");
         } else {
           console.log("Неверный логин или пароль");
         }

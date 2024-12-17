@@ -186,6 +186,10 @@ class API {
         return this.safeRequest(this.getInstance().delete(`fights/${fightId}/`));
     }
 
+    static async deleteShip(shipId: number) {
+        return this.safeRequest(this.getInstance().delete(`ships/${shipId}/`));
+    }
+
     static async updateProfile(email?: string, password?: string) {
         const body: Record<string, any> = {};
         if (email) body.email = email;

@@ -11,7 +11,7 @@ import { getCookie, deleteCookie } from "../../api/Utils";
 const Header: FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isLoggedIn, userName } = useSelector((state: RootState) => state.user);
+  const { isLoggedIn, userName, isStaff } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     const sessionId = getCookie("session_id");
@@ -53,7 +53,7 @@ const Header: FC = () => {
         <img src="/icon.svg" alt="Logo" />
       </Link>
       <div className="header-links">
-        <Link to="/ships">Корабли</Link>
+        <Link to={isStaff ? "/moderator-ships" : "/ships"}>Корабли</Link>
         <Link to="/fights">Сражения</Link>
         {isLoggedIn ? (
           <>

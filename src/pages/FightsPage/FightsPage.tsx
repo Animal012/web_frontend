@@ -112,13 +112,13 @@ const FightsPage = () => {
       <div className="filters">
         {isStaff && (
           <label>
-            Автор:
+            Создатель:
             <input
               type="text"
               className="fights-page-input"
               value={authorFilter}
               onChange={(e) => setAuthorFilter(e.target.value)}
-              placeholder="Введите автора"
+              placeholder="Введите создателя"
             />
           </label>
         )}
