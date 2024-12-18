@@ -5,7 +5,7 @@
   "identifier": "com.bmstu.meatfish",
   "build": {
     "frontendDist": "../dist",
-    "devUrl": "http://192.168.109.51:3000",
+    "devUrl": "http://localhost:3000",
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build"
   },

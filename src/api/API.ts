@@ -4,7 +4,7 @@ import { SHIPS_MOCK } from "../modules/mock";
 import Ajax from "./Ajax.ts";
 
 const API = {
-    BASE_URL: `http://192.168.109.51:8000/`,
+    BASE_URL: `http://localhost:8000/`,
 
     // async login({ username, password }: LoginParams) {
     //     const url = this.BASE_URL + "/login/";

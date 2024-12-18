@@ -61,7 +61,7 @@ const ShipPage = () => {
         return <div>Ошибка</div>;
     }
 
-    const imageUrl = `http://192.168.109.51:9000/navy-sea/${ship.id}.jpg`;
+    const imageUrl = `http://localhost:9000/navy-sea/${ship.id}.jpg`;
 
     return (
         <div>
