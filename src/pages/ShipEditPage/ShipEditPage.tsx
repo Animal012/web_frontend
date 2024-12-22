@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import API from "../../api/API"; // Импортируем API
+import { useDispatch, useSelector } from "react-redux";
+import { fetchShipDetails, updateShipDetails } from "../../slices/shipSlice";  // Импортируем экшены
+import { RootState } from "../../store"; // Типизированный root state
 import { BreadCrumbs } from "../../components/BreadCrumbs/BreadCrumbs";
+import { AppDispatch } from "../../store";
 import { ROUTE_LABELS } from "../../Route";
-import { SHIPS_MOCK } from "../../modules/mock";
 import "./ShipEditPage.css";
 
 interface Ship {
@@ -21,39 +23,23 @@ interface Ship {
 const ShipEditPage = () => {
     const { shipId } = useParams<{ shipId: string }>();
     const navigate = useNavigate();
-    const [ship, setShip] = useState<Ship | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const dispatch = useDispatch<AppDispatch>();
+
+    const { shipDetails, loading, error } = useSelector((state: RootState) => state.ship);
 
     const [editableShip, setEditableShip] = useState<Ship | null>(null);
 
     useEffect(() => {
-        const getShipDetails = async () => {
-            if (!shipId) return;
+        if (shipId) {
+            dispatch(fetchShipDetails(shipId));  // Запрашиваем данные о корабле
+        }
+    }, [shipId, dispatch]);
 
-            try {
-                const response = await API.getShipDetails(shipId);
-                const data = await response.json();
-                setShip(data);
-                setEditableShip(data); 
-            } catch (error) {
-                console.error("Ошибка при загрузке данных о корабле:", error);
-                const mockShip = SHIPS_MOCK.find((s) => String(s.id) === shipId);
-                if (mockShip) {
-                    setShip(mockShip);
-                    setEditableShip(mockShip);
-                    setError(null);
-                } else {
-                    setError("Корабль не найден в mock-данных");
-                    navigate(`/error/404`, { replace: true });
-                }
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        getShipDetails();
-    }, [shipId, navigate]);
+    useEffect(() => {
+        if (shipDetails) {
+            setEditableShip(shipDetails);  // Обновляем данные editableShip при получении из Redux
+        }
+    }, [shipDetails]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -66,59 +52,32 @@ const ShipEditPage = () => {
     };
 
     const handleSaveChanges = async () => {
-        if (editableShip !== null) { // Проверяем, что editableShip не null
+        if (editableShip) {
             try {
-                // Ждем завершения асинхронной операции
-                const response = await API.changeShip(
-                    Number(shipId), 
-                    editableShip.ship_name, 
-                    editableShip.description, 
-                    editableShip.year, 
-                    editableShip.length, 
-                    editableShip.displacement, 
-                    editableShip.crew, 
-                    editableShip.country
-                );
-                
-                // Даем результат в setShip после того как данные изменены
-                if (response.ok) {
-                    setShip((prevShip) => ({
-                        ...prevShip, // Сохраняем старые данные, если они не были изменены
-                        ship_name: editableShip.ship_name,
-                        description: editableShip.description,
-                        year: editableShip.year,
-                        displacement: editableShip.displacement,
-                        length: editableShip.length,
-                        crew: editableShip.crew,
-                        country: editableShip.country,
-                        // Убедитесь, что id присутствует и строка
-                        id: prevShip?.id || '', // Используем пустую строку, если id нет
-                        photo: prevShip?.photo || '' // Используем пустую строку, если фото нет
-                    }));
+                const action = await dispatch(updateShipDetails(editableShip));  // Диспетчеризация для обновления
+
+                if (updateShipDetails.fulfilled.match(action)) {
+                    navigate(`/moderator-ships`, { replace: true });
                 } else {
-                    setError("Не удалось сохранить изменения.");
+                    console.error("Не удалось сохранить изменения");
                 }
             } catch (error) {
-                console.error("Ошибка при сохранении изменений:", error);
-                setError("Не удалось сохранить изменения.");
+                console.error("Ошибка при сохранении изменений", error);
             }
-        } else {
-            setError("Данные корабля отсутствуют.");
         }
     };
-    
-    
 
-    if (loading) 
+    if (loading) {
         return <div className="loading-gif">
                     <img src="/loading.webp" alt="Loading" />
                 </div>;
+    }
 
     if (error) {
         return <div>{error}</div>;
     }
 
-    if (!ship) {
+    if (!shipDetails) {
         return <div>Корабль не найден.</div>;
     }
 
@@ -127,16 +86,15 @@ const ShipEditPage = () => {
             <div className="breadcrumbs-ship">
                 <BreadCrumbs
                     crumbs={[
-                        { label: ROUTE_LABELS.MODER_SHIPS,
-                            path: "/moderator-ships" },
-                        { label: ship.ship_name || "Корабль" },
+                        { label: ROUTE_LABELS.MODER_SHIPS, path: "/moderator-ships" },
+                        { label: shipDetails.ship_name || "Корабль" },
                     ]}
                 />
             </div>
             <div className="ship-page">
                 <div className="ship-details">
                     <div className="ship-image-card">
-                        <img src={ship.photo} alt={ship.ship_name} />
+                        <img src={shipDetails.photo} alt={shipDetails.ship_name} />
                     </div>
                     <div className="ship-info">
                         <h1>

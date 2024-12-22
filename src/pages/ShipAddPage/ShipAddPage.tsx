@@ -1,13 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import API from "../../api/API"; // Импортируем API
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../store";
+import { addShip } from "../../slices/shipSlice"; // Импортируем Thunk
 import { BreadCrumbs } from "../../components/BreadCrumbs/BreadCrumbs";
 import { ROUTE_LABELS } from "../../Route";
 import "./ShipAddPage.css";
 
 const ShipAddPage = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
     const [editableShip, setEditableShip] = useState({
+        id: "",
         ship_name: "",
         description: "",
         year: 0,
@@ -29,17 +33,9 @@ const ShipAddPage = () => {
 
     const handleSaveChanges = async () => {
         try {
-            const response = await API.addShip(
-                editableShip.ship_name,
-                editableShip.description,
-                editableShip.year,
-                editableShip.length,
-                editableShip.displacement,
-                editableShip.crew,
-                editableShip.country
-            );
-
-            if (response.ok) {
+            // Используем Thunk для добавления корабля
+            const action = await dispatch(addShip(editableShip));
+            if (addShip.fulfilled.match(action)) {
                 navigate("/moderator-ships", { replace: true }); // Переходим к списку кораблей
             } else {
                 setError("Не удалось создать корабль.");
