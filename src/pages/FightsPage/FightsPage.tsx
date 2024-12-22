@@ -158,6 +158,16 @@ const FightsPage = () => {
       </div>
 
       <div className="fights-list">
+        <div className="fight-row">
+          <div className="fight-row-section"><strong>№</strong></div>
+          <div className="fight-row-section"><strong>Название</strong></div>
+          <div className="fight-row-section"><strong>Статус</strong></div>
+          <div className="fight-row-section"><strong>Общее количество моряков</strong></div>
+          <div className="fight-row-section"><strong>Дата создания</strong></div>
+          <div className="fight-row-section"><strong>Дата формирования</strong></div>
+          <div className="fight-row-section"><strong>Дата завершения</strong></div>
+          {isStaff && <div className="fight-row-section"><strong>Создатель</strong></div>}
+        </div>
         {filteredFights.map((fight) => (
           <div
             key={fight.id}
@@ -165,37 +175,29 @@ const FightsPage = () => {
             onClick={() => navigate(`/fights/${fight.id}`)}
           >
             <div className="fight-row-section">
-              <strong>№</strong>
               <div>{fight.id}</div>
             </div>
             <div className="fight-row-section">
-              <strong>Название</strong>
               <div>{fight.fight_name}</div>
             </div>
             <div className="fight-row-section">
-              <strong>Статус</strong>
               <div>{getStatusText(fight.status)}</div>
             </div>
             <div className="fight-row-section">
-              <strong>Общее количество моряков</strong>
               <div>{getSailorsText(fight.sailors)}</div>
             </div>
             <div className="fight-row-section">
-              <strong>Дата создания</strong>
               <div>{formatDate(fight.created_at)}</div>
             </div>
             <div className="fight-row-section">
-              <strong>Дата формирования</strong>
               <div>{formatDate(fight.formed_at)}</div>
             </div>
             <div className="fight-row-section">
-              <strong>Дата завершения</strong>
               <div>{formatDate(fight.completed_at)}</div>
             </div>
 
             {isStaff && (
               <div className="fight-row-section">
-                <strong>Создатель</strong>
                 <div>{fight.creator}</div>
               </div>
             )}

@@ -147,7 +147,8 @@
 }
 
 .fight-submit,
-.fight-delete {
+.fight-delete,
+.fight-save-changes {
     display: block; /* Чтобы кнопки встали по центру */
     width: 30%; /* 20% ширины экрана */
     margin: 10px auto; /* Центрирование по горизонтали и небольшой отступ между кнопками */
@@ -214,4 +215,17 @@
     width: 100vw;
     height: 100vh;
     z-index: 9999;
+}
+
+.error {
+    border: 1px solid red;
+    background-color: #f8d7da;
+}
+
+.fight-save-changes {
+    background-color: #ffc400;
+}
+
+.fight-save-changes:hover {
+    background-color: #d07e11;
 }
