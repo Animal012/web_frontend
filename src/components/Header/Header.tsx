@@ -2,44 +2,23 @@ import { FC, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Header.css";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store";
-import { login, logout } from "../../slices/userSlice";
+import { RootState, AppDispatch } from "../../store";
+import { loginUserFromSession, logoutUser } from "../../slices/userSlice";
 import { resetFilters } from "../../slices/shipsSlice";
-import API from "../../api/API";
-import { getCookie, deleteCookie } from "../../api/Utils";
 
 const Header: FC = () => {
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
   const { isLoggedIn, userName, isStaff } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
-    const sessionId = getCookie("session_id");
-    if (sessionId) {
-      const checkSession = async () => {
-        try {
-          const sessionData = await API.getSession();
-          if (sessionData.username) {
-            dispatch(
-              login({ username: sessionData.username, isStaff: sessionData.isStaff })
-            ); // Обновляем Redux с новыми данными
-          } else {
-            dispatch(logout());
-          }
-        } catch (error) {
-          console.error("Ошибка при проверке сессии:", error);
-          dispatch(logout());
-        }
-      };
-      checkSession();
-    }
+    // Проверка сессии при монтировании компонента
+    dispatch(loginUserFromSession());
   }, [dispatch]);
 
   const handleLogout = async () => {
     try {
-      await API.logout();
-      deleteCookie("session_id");
-      dispatch(logout());
+      await dispatch(logoutUser()).unwrap(); // Дожидаемся завершения действия
       dispatch(resetFilters());
       navigate("/"); // Переход на главную страницу
     } catch (error) {

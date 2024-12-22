@@ -1,58 +1,35 @@
-import { FC, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { FC, useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { login } from "../../slices/userSlice";
-import API from "../../api/API";
+import { RootState, AppDispatch } from "../../store";
+import { registerUser, loginUser } from "../../slices/userSlice";
 import "./AuthPage.css";
+import { useDispatch } from "react-redux";
 
 const Auth: FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isRegister, setIsRegister] = useState(false);
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch(); // Указываем типизацию для dispatch
   const navigate = useNavigate();
+  const { loading, error } = useSelector((state: RootState) => state.user);
 
   const toggleAuthMode = () => setIsRegister((prev) => !prev);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     try {
-      let response;
-  
       if (isRegister) {
-        response = await API.auth({ email, password });
-        const data = await response.json();
-  
-        if (data.status === "Success") {
-          const authResponse = await API.login({ email, password });
-          const authData = await authResponse.json();
-  
-          if (authData.status === "ok") {
-            dispatch(login({ username: authData.username, isStaff: authData.isStaff }));
-            navigate("/");
-          } else {
-            console.log("Ошибка при авторизации");
-          }
-        } else {
-          console.log("Ошибка регистрации");
-        }
+        await dispatch(registerUser({ email, password })).unwrap(); // `.unwrap()` для обработки ошибок из thunk
+        await dispatch(loginUser({ email, password })).unwrap();
       } else {
-        response = await API.login({ email, password });
-        const data = await response.json();
-  
-        if (data.status === "ok") {
-          dispatch(login({ username: data.username, isStaff: data.isStaff }));
-          navigate("/");
-        } else {
-          console.log("Неверный логин или пароль");
-        }
+        await dispatch(loginUser({ email, password })).unwrap();
       }
-    } catch (error) {
-      console.error("Ошибка:", error);
-      alert("Произошла ошибка. Попробуйте снова.");
+      navigate("/");
+    } catch (err) {
+      console.error("Ошибка:", err);
     }
-  };  
+  };
 
   return (
     <div className="auth-page">
@@ -78,10 +55,11 @@ const Auth: FC = () => {
             required
           />
         </div>
-        <button type="submit">
-          {isRegister ? "Зарегистрироваться" : "Войти"}
+        <button type="submit" disabled={loading}>
+          {loading ? "Загрузка..." : isRegister ? "Зарегистрироваться" : "Войти"}
         </button>
       </form>
+      {error && <p className="error">{error}</p>}
       <p>
         {isRegister ? "Уже есть аккаунт?" : "Нет аккаунта?"}{" "}
         <button type="button" onClick={toggleAuthMode}>
@@ -90,6 +68,6 @@ const Auth: FC = () => {
       </p>
     </div>
   );
-};  
+};
 
 export default Auth;
