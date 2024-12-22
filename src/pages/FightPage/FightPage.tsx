@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import API from "../../api/API";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchFightDetails, updateFightFields, updateShipFields, deleteFight, deleteShipFromFight } from "../../slices/fightsSlice";
+import { RootState, AppDispatch } from "../../store";
 import "./FightPage.css";
 
 interface Ship {
@@ -28,10 +30,10 @@ interface Fight {
 const FightPage = () => {
     const { fightId } = useParams<{ fightId: string }>();
     const navigate = useNavigate();
-    const [fight, setFight] = useState<Fight | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [isFormValid, setIsFormValid] = useState(true);  // Состояние для проверки валидности формы
+    const dispatch = useDispatch<AppDispatch>();
+    const { fight, loading, error } = useSelector((state: RootState) => state.fights);
+    
+    const [isFormValid, setIsFormValid] = useState(true);
     const [formErrors, setFormErrors] = useState<{
         fightName: boolean;
         result: boolean;
@@ -42,38 +44,32 @@ const FightPage = () => {
         admiral: []
     });
 
+    const [localFight, setLocalFight] = useState<Fight | null>(null);
+
     useEffect(() => {
-        const getFightDetails = async () => {
-            if (!fightId) return;
+        if (fightId) {
+            dispatch(fetchFightDetails(fightId));
+        }
+    }, [dispatch, fightId]);
 
-            try {
-                const response = await API.getFightById(Number(fightId));
-                const data = await response.json();
-                setFight(data);
-            } catch (error) {
-                console.error("Ошибка при загрузке данных о сражении:", error);
-                setError("Не удалось загрузить данные о сражении");
-            } finally {
-                setLoading(false);
-            }
-        };
+    useEffect(() => {
+        if (fight) {
+            setLocalFight(fight);
+        }
+    }, [fight]);
 
-        getFightDetails();
-    }, [fightId]);
-
-    if (loading) return <div className="loading-gif"><img src="/loading.webp" alt="loading"></img></div>;
+    if (loading) return <div className="loading-gif"><img src="/loading.webp" alt="loading" /></div>;
     if (error) return <div>{error}</div>;
     if (!fight) return <div>Сражение не найдено.</div>;
 
     const isEditable = fight.status !== 'f' && fight.status !== 'c' && fight.status !== 'r';
 
-    // Проверка на заполненность всех обязательных полей
     const validateForm = () => {
-        if (!fight) return false;
+        if (!localFight) return false;
 
-        const fightName = fight.fight_name?.trim();
-        const result = fight.result?.trim();
-        const admiralEmpty = fight.ships.map(ship => !ship.admiral?.trim());
+        const fightName = localFight.fight_name?.trim();
+        const result = localFight.result?.trim();
+        const admiralEmpty = localFight.ships.map(ship => !ship.admiral?.trim());
 
         setFormErrors({
             fightName: !fightName,
@@ -92,11 +88,11 @@ const FightPage = () => {
 
     const handleSubmit = async () => {
         if (!validateForm()) {
-            return;  // Если форма не валидна, просто не отправляем запрос
+            return;
         }
 
         try {
-            await API.formFight(Number(fightId));
+            await dispatch(updateFightFields({ fightId: Number(fightId), fightName: localFight?.fight_name || "", result: localFight?.result || "" }));
             navigate('/');
         } catch (error) {
             console.error('Ошибка при завершении сражения:', error);
@@ -105,7 +101,7 @@ const FightPage = () => {
 
     const handleDelete = async () => {
         try {
-            await API.deleteFight(Number(fightId));
+            await dispatch(deleteFight(Number(fightId)));
             navigate('/');
         } catch (error) {
             console.error('Ошибка при удалении:', error);
@@ -113,87 +109,71 @@ const FightPage = () => {
     };
 
     const handleShipDelete = async (shipId: string, index: number) => {
-        if (!fight) return;
+        if (!localFight) return;
         try {
-            await API.deleteShipFromDraft(Number(fightId), Number(shipId));
-            const updatedShips = [...fight.ships];
-            updatedShips.splice(index, 1); // Удаляем корабль из массива
-            setFight({ ...fight, ships: updatedShips });
+            await dispatch(deleteShipFromFight({ fightId: Number(fightId), shipId: Number(shipId) }));
+            const updatedShips = [...localFight.ships];
+            updatedShips.splice(index, 1);
+            setLocalFight({ ...localFight, ships: updatedShips });
         } catch (error) {
             console.error('Ошибка при удалении корабля:', error);
         }
     };
 
     const handleSaveChanges = async () => {
+        if (!localFight) return;
         try {
-            // Обновляем поля Название сражения и Результат
-            await API.changeAddFields(Number(fightId), fight.fight_name, fight.result);
-    
-            // Обновляем адмиралов всех кораблей
-            for (let i = 0; i < fight.ships.length; i++) {
-                const shipId = fight.ships[i].ship.id; // Используем id из объекта ship
-                const admiral = fight.ships[i].admiral; // Получаем имя адмирала
-                await API.changeShipFields(Number(shipId), Number(fightId), admiral);
+            await dispatch(updateFightFields({ fightId: Number(fightId), fightName: localFight.fight_name, result: localFight.result }));
+
+            // Save admiral changes for each ship
+            for (let i = 0; i < localFight.ships.length; i++) {
+                const shipId = localFight.ships[i].ship.id;
+                const admiral = localFight.ships[i].admiral;
+                await dispatch(updateShipFields({ shipId: Number(shipId), fightId: Number(fightId), admiral }));
             }
-    
+
             console.log('Изменения сохранены');
         } catch (error) {
             console.error('Ошибка при сохранении изменений:', error);
         }
     };
-    
 
-    // Обработчик для изменений в полях
     const handleInputChange = (field: string, value: string, index?: number) => {
+        if (!localFight) return;
+
         if (field === 'fightName') {
-            setFight((prevFight) => {
-                if (!prevFight) return prevFight; // Возвращаем prevFight, если оно null
-                return { ...prevFight, fight_name: value };
-            });
-            setFormErrors({ ...formErrors, fightName: !value.trim() });
+            setLocalFight({ ...localFight, fight_name: value });
         } else if (field === 'result') {
-            setFight((prevFight) => {
-                if (!prevFight) return prevFight;
-                return { ...prevFight, result: value };
-            });
-            setFormErrors({ ...formErrors, result: !value.trim() });
+            setLocalFight({ ...localFight, result: value });
         } else if (field === 'admiral' && index !== undefined) {
-            setFight((prevFight) => {
-                if (!prevFight) return prevFight;
-                const updatedShips = [...prevFight.ships];
-                updatedShips[index].admiral = value;
-                return { ...prevFight, ships: updatedShips };
-            });
-            const updatedAdmiralErrors = [...formErrors.admiral];
-            updatedAdmiralErrors[index] = !value.trim();
-            setFormErrors({ ...formErrors, admiral: updatedAdmiralErrors });
+            const updatedShips = [...localFight.ships];
+            updatedShips[index] = { ...updatedShips[index], admiral: value }; // Обновление адмирала конкретного корабля
+            setLocalFight({ ...localFight, ships: updatedShips });
         }
     };
-    
 
     return (
         <div className="fight-page">
             <h1 className="fight-name-fix">Название сражения</h1>
             <input
-                value={fight.fight_name}
+                value={localFight?.fight_name || ''}
                 type="text"
-                className={`fight-name-input ${formErrors.fightName ? 'error' : ''}`}  // Подсветка поля
+                className={`fight-name-input ${formErrors.fightName ? 'error' : ''}`}
                 onChange={(e) => handleInputChange('fightName', e.target.value)}
                 disabled={!isEditable}
             />
             <h1 className="fight-result-fix">Итог сражения</h1>
             <input
-                value={fight.result}
+                value={localFight?.result || ''}
                 type="text"
-                className={`fight-result-input ${formErrors.result ? 'error' : ''}`}  // Подсветка поля
+                className={`fight-result-input ${formErrors.result ? 'error' : ''}`}
                 onChange={(e) => handleInputChange('result', e.target.value)}
                 disabled={!isEditable}
             />
 
             <div className="battle-container">
-                {fight.ships.map(({ ship, admiral }, index) => (
+                {localFight?.ships.map(({ ship, admiral }, index) => (
                     <div key={index} className="battle-row">
-                        {/* Карточка корабля */}
                         <div className="ship-card">
                             <div className="ship-content">
                                 <img src={ship.photo} alt={ship.ship_name} className="ship-photo" />
@@ -209,14 +189,13 @@ const FightPage = () => {
                             </div>
                         </div>
 
-                        {/* Поле адмирала */}
                         <div className="admiral-card">
                             <h2>Адмирал</h2>
                             <input
-                                value={admiral}  // Используем value, чтобы контролировать поле
+                                value={admiral || ''}  // Обеспечиваем корректную работу поля с пустыми значениями
                                 type="text"
-                                className={`admiral-input ${formErrors.admiral[index] ? 'error' : ''}`}  // Подсветка поля
-                                onChange={(e) => handleInputChange('admiral', e.target.value, index)}  // Обработка изменения
+                                className={`admiral-input ${formErrors.admiral[index] ? 'error' : ''}`}
+                                onChange={(e) => handleInputChange('admiral', e.target.value, index)}
                                 disabled={!isEditable}
                             />
                         </div>

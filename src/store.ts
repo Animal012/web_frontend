@@ -3,11 +3,13 @@ import shipsReducer from "./slices/shipsSlice";
 import shipReducer from "./slices/shipSlice";
 import userReducer from "./slices/userSlice";
 import fightReducer from "./slices/fightSlice";
+import fightsReducer from "./slices/fightsSlice";
 
 const rootReducer = combineReducers({
     ships: shipsReducer,
     ship: shipReducer,
     user: userReducer,
+    fights: fightsReducer,
     fight: fightReducer,
 });
 
