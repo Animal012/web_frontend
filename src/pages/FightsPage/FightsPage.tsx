@@ -167,6 +167,7 @@ const FightsPage = () => {
           <div className="fight-row-section"><strong>Дата формирования</strong></div>
           <div className="fight-row-section"><strong>Дата завершения</strong></div>
           {isStaff && <div className="fight-row-section"><strong>Создатель</strong></div>}
+          {isStaff && <div className="fight-row-section"><strong>Действие</strong></div>}
         </div>
         {filteredFights.map((fight) => (
           <div
@@ -202,28 +203,35 @@ const FightsPage = () => {
               </div>
             )}
 
-            {isStaff && fight.status === "f" && (
-              <div className="fight-row-buttons">
-                <button
-                  className="fight-complete"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAccept(fight.id);
-                  }}
-                >
-                  Принять
-                </button>
-                <button
-                  className="fight-reject"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleReject(fight.id);
-                  }}
-                >
-                  Отклонить
-                </button>
+            {isStaff && (
+              <div className="fight-row-section">
+                {fight.status === "f" ? (
+                  <div className="fight-row-buttons">
+                    <button
+                      className="fight-complete"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAccept(fight.id);
+                      }}
+                    >
+                      Принять
+                    </button>
+                    <button
+                      className="fight-reject"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleReject(fight.id);
+                      }}
+                    >
+                      Отклонить
+                    </button>
+                  </div>
+                ) : (
+                  <div>—</div>
+                )}
               </div>
             )}
+
           </div>
         ))}
       </div>
