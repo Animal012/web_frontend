@@ -1,9 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import "./ShipCard.css";
-import API from "../../api/API";
-import { setDraftFight } from "../../slices/fightSlice"; 
+import { setDraftFight } from "../../slices/fightSlice";
+import { addShipToFight } from "../../slices/shipSlice";
+import { RootState, AppDispatch } from "../../store";
 
 interface Ship {
     id: string;
@@ -19,7 +20,9 @@ interface Ship {
 
 const ShipCard: React.FC<{ ship: Ship }> = ({ ship }) => {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
+    const dispatch: AppDispatch = useDispatch();
+    const { loading, error } = useSelector(
+        (state: RootState) => state.ship);
 
     const handleTitleClick = () => {
         navigate(`/ships/${ship.id}`);
@@ -28,16 +31,17 @@ const ShipCard: React.FC<{ ship: Ship }> = ({ ship }) => {
     const handleAddToFight = async (event: React.MouseEvent) => {
         event.stopPropagation();
         try {
-            const response = await API.addShipToDraft(Number(ship.id));
-            const data = await response.json();
+            // Диспатчим действие для добавления корабля в сражение
+            const result = await dispatch(addShipToFight(Number(ship.id))).unwrap();
 
-            if (data.draft_fight_id) {
+            // Если добавление прошло успешно, обновляем состояние с новым draft_fight_id
+            if (result.draft_fight_id !== null) {
                 dispatch(setDraftFight({
-                    draftFightId: data.draft_fight_id,
-                    count: data.count,
+                    draftFightId: Number(result.draft_fight_id),
+                    count: result.count,
                 }));
             } else {
-                console.error("Ошибка: неверный ответ от API");
+                console.error("Ошибка: draft_fight_id отсутствует в ответе API");
             }
         } catch (error) {
             console.error("Ошибка при добавлении корабля в сражение:", error);
@@ -55,10 +59,11 @@ const ShipCard: React.FC<{ ship: Ship }> = ({ ship }) => {
             <p className="ship-details">Водоизмещение: {ship.displacement} т</p>
             <p className="ship-details">Страна: {ship.country}</p>
             <div className="ship-add-button">
-                <button onClick={handleAddToFight}>
-                    Добавить в сражение
+                <button onClick={handleAddToFight} disabled={loading}>
+                    {loading ? "Загружается..." : "Добавить в сражение"}
                 </button>
             </div>
+            {error && <p className="error-message">{error}</p>}
         </div>
     );
 };

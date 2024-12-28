@@ -74,6 +74,13 @@ export const deleteShipFromFight = createAsyncThunk<void, { fightId: number; shi
     }
 );
 
+export const formFight = createAsyncThunk<void, number>(
+    "fights/formFight",
+    async (fightId) => {
+        await API.formFight(fightId); // Вызов API для оформления сражения
+    }
+);
+
 const fightSlice = createSlice({
     name: "fights",
     initialState,
@@ -99,6 +106,11 @@ const fightSlice = createSlice({
                     state.fight.ships = state.fight.ships.filter(
                         (ship) => Number(ship.ship.id) !== action.meta.arg.shipId
                     );
+                }
+            })
+            .addCase(formFight.fulfilled, (state) => {
+                if (state.fight) {
+                    state.fight.status = "f";
                 }
             });
             

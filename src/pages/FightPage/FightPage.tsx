@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchFightDetails, updateFightFields, updateShipFields, deleteFight, deleteShipFromFight } from "../../slices/fightsSlice";
+import { fetchFightDetails, updateFightFields, updateShipFields, deleteFight, deleteShipFromFight, formFight } from "../../slices/fightsSlice";
 import { RootState, AppDispatch } from "../../store";
 import "./FightPage.css";
 
@@ -90,9 +90,11 @@ const FightPage = () => {
         if (!validateForm()) {
             return;
         }
-
         try {
             await dispatch(updateFightFields({ fightId: Number(fightId), fightName: localFight?.fight_name || "", result: localFight?.result || "" }));
+
+            await dispatch(formFight(Number(fightId)));
+    
             navigate('/');
         } catch (error) {
             console.error('Ошибка при завершении сражения:', error);

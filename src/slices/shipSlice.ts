@@ -16,6 +16,8 @@ interface Ship {
 
 interface ShipState {
     ships: Ship[];
+    draftFightId: string | null; // Добавляем draftFightId
+    count: number;
     loading: boolean;
     error: string | null;
     shipDetails: Ship | null;  // Для хранения данных о конкретном корабле
@@ -30,6 +32,8 @@ interface FetchShipsResponse {
 // Начальное состояние
 const initialState: ShipState = {
     ships: [],
+    draftFightId: null,  // Добавляем draftFightId
+    count: 0,
     loading: false,
     error: null,
     shipDetails: null,  // Для конкретного корабля
@@ -105,6 +109,22 @@ export const updateShipDetails = createAsyncThunk<Ship, Ship>(
     }
 );
 
+export const addShipToFight = createAsyncThunk(
+    "ship/addShipToFight",
+    async (shipId: number, { rejectWithValue }) => {
+        try {
+            await API.addShipToDraft(shipId);
+
+            const response = await API.getShips();
+            const data: FetchShipsResponse = await response.json();
+
+            return data;
+        } catch (error) {
+            return rejectWithValue("Ошибка при добавлении корабля в сражение");
+        }
+    }
+);
+
 const shipSlice = createSlice({
     name: "ship",
     initialState,
@@ -162,6 +182,19 @@ const shipSlice = createSlice({
                 state.error = null;
             })
             .addCase(updateShipDetails.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(addShipToFight.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(addShipToFight.fulfilled, (state, action: PayloadAction<FetchShipsResponse>) => {
+                state.draftFightId = action.payload.draft_fight_id;
+                state.count = action.payload.count;
+                state.loading = false;
+            })
+            .addCase(addShipToFight.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             });
